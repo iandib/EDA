@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "print_grid.h": "c",
+        "display_grid.h": "c",
+        "time.h": "c",
+        "calc_gen.h": "c",
+        "allegro_primitives.h": "c",
+        "stdio.h": "c",
+        "hardware.h": "c",
+        "stdint.h": "c",
+        "compare": "cpp",
+        "common.h": "c",
+        "utilities.h": "c",
+        "game_logic.h": "c",
+        "stdbool.h": "c",
+        "stdlib.h": "c",
+        "allegro_image.h": "c",
+        "th2_display_sound.h": "c",
+        "semaphore.h": "c"
+    },
+    "cmake.sourceDirectory": "E:/3C/EDA/Practice/Repo/Starter Code",
+    "C_Cpp.default.compilerPath": "C:/msys64/mingw64/bin/g++.exe"
+}
