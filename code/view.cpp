@@ -94,7 +94,12 @@ void renderView(View *view, OrbitalSim *sim)
     ClearBackground(BLACK);
     BeginMode3D(view->camera);
 
-    // Fill in your 3D drawing code here:
+    // * 3D drawing code
+    
+    // test to see if the sphere is drawn
+    // void DrawSphere(Vector3 centerPos, float radius, Color color)
+    DrawSphere({0, 0, 0}, 1.0f, WHITE);
+    //DrawSphere(solarSystem[0].position, solarSystem[0].radius, solarSystem[0].color);
 
 
 

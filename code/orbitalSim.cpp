@@ -60,6 +60,13 @@ void configureAsteroid(OrbitalBody *body, float centerMass)
     // body->velocity = {-v * sinf(phi), vy, v * cosf(phi)};
 }
 
+
+
+// TODO terminar/corregir
+// Intento crear un arreglo dinámico que contenga datos tipo OrbitalBody
+OrbitalBody* pOrbitalBody = new OrbitalBody[10];
+
+
 /**
  * @brief Constructs an orbital simulation
  *
@@ -68,12 +75,13 @@ void configureAsteroid(OrbitalBody *body, float centerMass)
  */
 OrbitalSim *constructOrbitalSim(float timeStep)
 {
-    // Your code goes here...
+    
 
 
 
     return NULL; // This should return your orbital sim
 }
+
 
 /**
  * @brief Destroys an orbital simulation
