@@ -8,9 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "E:/3C/EDA/Practice/Repo/Starter Code/main.cpp" "CMakeFiles/orbitalsim.dir/main.cpp.obj" "gcc" "CMakeFiles/orbitalsim.dir/main.cpp.obj.d"
-  "E:/3C/EDA/Practice/Repo/Starter Code/orbitalSim.cpp" "CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj" "gcc" "CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj.d"
-  "E:/3C/EDA/Practice/Repo/Starter Code/view.cpp" "CMakeFiles/orbitalsim.dir/view.cpp.obj" "gcc" "CMakeFiles/orbitalsim.dir/view.cpp.obj.d"
+  "E:/3C/EDA/Practice/Repo/code/main.cpp" "CMakeFiles/orbitalsim.dir/main.cpp.obj" "gcc" "CMakeFiles/orbitalsim.dir/main.cpp.obj.d"
+  "E:/3C/EDA/Practice/Repo/code/orbitalSim.cpp" "CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj" "gcc" "CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj.d"
+  "E:/3C/EDA/Practice/Repo/code/view.cpp" "CMakeFiles/orbitalsim.dir/view.cpp.obj" "gcc" "CMakeFiles/orbitalsim.dir/view.cpp.obj.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

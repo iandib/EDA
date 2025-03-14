@@ -1,4 +1,4 @@
-# Install script for directory: E:/3C/EDA/Practice/Repo/Starter Code
+# Install script for directory: E:/3C/EDA/Practice/Repo/code
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

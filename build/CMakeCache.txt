@@ -26,8 +26,8 @@ CMAKE_BUILD_TYPE:STRING=Debug
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
-//No help, variable specified on the command line.
-CMAKE_CXX_COMPILER:FILEPATH=C:/msys64/mingw64/bin/g++.exe
+//CXX compiler
+CMAKE_CXX_COMPILER:STRING=C:/msys64/mingw64/bin/g++.exe
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -55,8 +55,8 @@ CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 //Libraries linked by default with all C++ applications.
 CMAKE_CXX_STANDARD_LIBRARIES:STRING=-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
 
-//No help, variable specified on the command line.
-CMAKE_C_COMPILER:FILEPATH=C:/msys64/mingw64/bin/gcc.exe
+//C compiler
+CMAKE_C_COMPILER:STRING=C:/msys64/mingw64/bin/gcc.exe
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -254,7 +254,7 @@ orbitalsim_BINARY_DIR:STATIC=E:/3C/EDA/Practice/Repo/build
 orbitalsim_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-orbitalsim_SOURCE_DIR:STATIC=E:/3C/EDA/Practice/Repo/Starter Code
+orbitalsim_SOURCE_DIR:STATIC=E:/3C/EDA/Practice/Repo/code
 
 //Path to a library.
 pkgcfg_lib_PC_RAYLIB_raylib:FILEPATH=C:/msys64/mingw64/lib/libraylib.dll.a
@@ -355,7 +355,7 @@ CMAKE_GENERATOR_PLATFORM:INTERNAL=
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
-CMAKE_HOME_DIRECTORY:INTERNAL=E:/3C/EDA/Practice/Repo/Starter Code
+CMAKE_HOME_DIRECTORY:INTERNAL=E:/3C/EDA/Practice/Repo/code
 //ADVANCED property for variable: CMAKE_LINKER
 CMAKE_LINKER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MAKE_PROGRAM
@@ -431,32 +431,32 @@ CMAKE_TAPI-ADVANCED:INTERNAL=1
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding raylib
 FIND_PACKAGE_MESSAGE_DETAILS_raylib:INTERNAL=[C:/msys64/mingw64/lib/libraylib.dll.a][C:/msys64/mingw64/include][v()]
-PC_RAYLIB_CFLAGS:INTERNAL=-IC:/msys64/mingw64/include
+PC_RAYLIB_CFLAGS:INTERNAL=-IC:/msys64/mingw64/bin/../include
 PC_RAYLIB_CFLAGS_I:INTERNAL=
 PC_RAYLIB_CFLAGS_OTHER:INTERNAL=
 PC_RAYLIB_FOUND:INTERNAL=1
-PC_RAYLIB_INCLUDEDIR:INTERNAL=C:/msys64/mingw64/include
-PC_RAYLIB_INCLUDE_DIRS:INTERNAL=C:/msys64/mingw64/include
-PC_RAYLIB_LDFLAGS:INTERNAL=-LC:/msys64/mingw64/lib;-lraylib
+PC_RAYLIB_INCLUDEDIR:INTERNAL=C:/msys64/mingw64/bin/../include
+PC_RAYLIB_INCLUDE_DIRS:INTERNAL=C:/msys64/mingw64/bin/../include
+PC_RAYLIB_LDFLAGS:INTERNAL=-LC:/msys64/mingw64/bin/../lib;-lraylib
 PC_RAYLIB_LDFLAGS_OTHER:INTERNAL=
-PC_RAYLIB_LIBDIR:INTERNAL=C:/msys64/mingw64/lib
+PC_RAYLIB_LIBDIR:INTERNAL=C:/msys64/mingw64/bin/../lib
 PC_RAYLIB_LIBRARIES:INTERNAL=raylib
-PC_RAYLIB_LIBRARY_DIRS:INTERNAL=C:/msys64/mingw64/lib
+PC_RAYLIB_LIBRARY_DIRS:INTERNAL=C:/msys64/mingw64/bin/../lib
 PC_RAYLIB_LIBS:INTERNAL=
 PC_RAYLIB_LIBS_L:INTERNAL=
 PC_RAYLIB_LIBS_OTHER:INTERNAL=
 PC_RAYLIB_LIBS_PATHS:INTERNAL=
 PC_RAYLIB_MODULE_NAME:INTERNAL=raylib
-PC_RAYLIB_PREFIX:INTERNAL=C:/msys64/mingw64
-PC_RAYLIB_STATIC_CFLAGS:INTERNAL=-IC:/msys64/mingw64/include
+PC_RAYLIB_PREFIX:INTERNAL=C:/msys64/mingw64/bin/..
+PC_RAYLIB_STATIC_CFLAGS:INTERNAL=-IC:/msys64/mingw64/bin/../include
 PC_RAYLIB_STATIC_CFLAGS_I:INTERNAL=
 PC_RAYLIB_STATIC_CFLAGS_OTHER:INTERNAL=
-PC_RAYLIB_STATIC_INCLUDE_DIRS:INTERNAL=C:/msys64/mingw64/include
-PC_RAYLIB_STATIC_LDFLAGS:INTERNAL=-LC:/msys64/mingw64/lib;-lraylib;-lglfw3;-lgdi32
+PC_RAYLIB_STATIC_INCLUDE_DIRS:INTERNAL=C:/msys64/mingw64/bin/../include
+PC_RAYLIB_STATIC_LDFLAGS:INTERNAL=-LC:/msys64/mingw64/bin/../lib;-lraylib;-lglfw3;-lgdi32
 PC_RAYLIB_STATIC_LDFLAGS_OTHER:INTERNAL=
 PC_RAYLIB_STATIC_LIBDIR:INTERNAL=
 PC_RAYLIB_STATIC_LIBRARIES:INTERNAL=raylib;glfw3;gdi32
-PC_RAYLIB_STATIC_LIBRARY_DIRS:INTERNAL=C:/msys64/mingw64/lib
+PC_RAYLIB_STATIC_LIBRARY_DIRS:INTERNAL=C:/msys64/mingw64/bin/../lib
 PC_RAYLIB_STATIC_LIBS:INTERNAL=
 PC_RAYLIB_STATIC_LIBS_L:INTERNAL=
 PC_RAYLIB_STATIC_LIBS_OTHER:INTERNAL=
@@ -476,7 +476,7 @@ __pkg_config_arguments_PC_RAYLIB:INTERNAL=QUIET;raylib
 __pkg_config_checked_PC_RAYLIB:INTERNAL=1
 //ADVANCED property for variable: pkgcfg_lib_PC_RAYLIB_raylib
 pkgcfg_lib_PC_RAYLIB_raylib-ADVANCED:INTERNAL=1
-prefix_result:INTERNAL=C:/msys64/mingw64/lib
+prefix_result:INTERNAL=C:/msys64/mingw64/bin/../lib
 //ADVANCED property for variable: raylib_INCLUDE_DIR
 raylib_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: raylib_LIBRARY

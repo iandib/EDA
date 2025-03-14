@@ -56,7 +56,7 @@ RM = "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Common
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "E:\3C\EDA\Practice\Repo\Starter Code"
+CMAKE_SOURCE_DIR = E:\3C\EDA\Practice\Repo\code
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = E:\3C\EDA\Practice\Repo\build

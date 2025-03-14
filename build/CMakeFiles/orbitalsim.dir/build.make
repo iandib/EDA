@@ -52,7 +52,7 @@ RM = "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Common
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "E:\3C\EDA\Practice\Repo\Starter Code"
+CMAKE_SOURCE_DIR = E:\3C\EDA\Practice\Repo\code
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = E:\3C\EDA\Practice\Repo\build
@@ -69,46 +69,46 @@ include CMakeFiles/orbitalsim.dir/progress.make
 include CMakeFiles/orbitalsim.dir/flags.make
 
 CMakeFiles/orbitalsim.dir/main.cpp.obj: CMakeFiles/orbitalsim.dir/flags.make
-CMakeFiles/orbitalsim.dir/main.cpp.obj: E:/3C/EDA/Practice/Repo/Starter\ Code/main.cpp
+CMakeFiles/orbitalsim.dir/main.cpp.obj: E:/3C/EDA/Practice/Repo/code/main.cpp
 CMakeFiles/orbitalsim.dir/main.cpp.obj: CMakeFiles/orbitalsim.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=E:\3C\EDA\Practice\Repo\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/orbitalsim.dir/main.cpp.obj"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/orbitalsim.dir/main.cpp.obj -MF CMakeFiles\orbitalsim.dir\main.cpp.obj.d -o CMakeFiles\orbitalsim.dir\main.cpp.obj -c "E:\3C\EDA\Practice\Repo\Starter Code\main.cpp"
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/orbitalsim.dir/main.cpp.obj -MF CMakeFiles\orbitalsim.dir\main.cpp.obj.d -o CMakeFiles\orbitalsim.dir\main.cpp.obj -c E:\3C\EDA\Practice\Repo\code\main.cpp
 
 CMakeFiles/orbitalsim.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/orbitalsim.dir/main.cpp.i"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "E:\3C\EDA\Practice\Repo\Starter Code\main.cpp" > CMakeFiles\orbitalsim.dir\main.cpp.i
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E E:\3C\EDA\Practice\Repo\code\main.cpp > CMakeFiles\orbitalsim.dir\main.cpp.i
 
 CMakeFiles/orbitalsim.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/orbitalsim.dir/main.cpp.s"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "E:\3C\EDA\Practice\Repo\Starter Code\main.cpp" -o CMakeFiles\orbitalsim.dir\main.cpp.s
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\3C\EDA\Practice\Repo\code\main.cpp -o CMakeFiles\orbitalsim.dir\main.cpp.s
 
 CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj: CMakeFiles/orbitalsim.dir/flags.make
-CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj: E:/3C/EDA/Practice/Repo/Starter\ Code/orbitalSim.cpp
+CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj: E:/3C/EDA/Practice/Repo/code/orbitalSim.cpp
 CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj: CMakeFiles/orbitalsim.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=E:\3C\EDA\Practice\Repo\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj -MF CMakeFiles\orbitalsim.dir\orbitalSim.cpp.obj.d -o CMakeFiles\orbitalsim.dir\orbitalSim.cpp.obj -c "E:\3C\EDA\Practice\Repo\Starter Code\orbitalSim.cpp"
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj -MF CMakeFiles\orbitalsim.dir\orbitalSim.cpp.obj.d -o CMakeFiles\orbitalsim.dir\orbitalSim.cpp.obj -c E:\3C\EDA\Practice\Repo\code\orbitalSim.cpp
 
 CMakeFiles/orbitalsim.dir/orbitalSim.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/orbitalsim.dir/orbitalSim.cpp.i"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "E:\3C\EDA\Practice\Repo\Starter Code\orbitalSim.cpp" > CMakeFiles\orbitalsim.dir\orbitalSim.cpp.i
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E E:\3C\EDA\Practice\Repo\code\orbitalSim.cpp > CMakeFiles\orbitalsim.dir\orbitalSim.cpp.i
 
 CMakeFiles/orbitalsim.dir/orbitalSim.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/orbitalsim.dir/orbitalSim.cpp.s"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "E:\3C\EDA\Practice\Repo\Starter Code\orbitalSim.cpp" -o CMakeFiles\orbitalsim.dir\orbitalSim.cpp.s
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\3C\EDA\Practice\Repo\code\orbitalSim.cpp -o CMakeFiles\orbitalsim.dir\orbitalSim.cpp.s
 
 CMakeFiles/orbitalsim.dir/view.cpp.obj: CMakeFiles/orbitalsim.dir/flags.make
-CMakeFiles/orbitalsim.dir/view.cpp.obj: E:/3C/EDA/Practice/Repo/Starter\ Code/view.cpp
+CMakeFiles/orbitalsim.dir/view.cpp.obj: E:/3C/EDA/Practice/Repo/code/view.cpp
 CMakeFiles/orbitalsim.dir/view.cpp.obj: CMakeFiles/orbitalsim.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=E:\3C\EDA\Practice\Repo\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/orbitalsim.dir/view.cpp.obj"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/orbitalsim.dir/view.cpp.obj -MF CMakeFiles\orbitalsim.dir\view.cpp.obj.d -o CMakeFiles\orbitalsim.dir\view.cpp.obj -c "E:\3C\EDA\Practice\Repo\Starter Code\view.cpp"
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/orbitalsim.dir/view.cpp.obj -MF CMakeFiles\orbitalsim.dir\view.cpp.obj.d -o CMakeFiles\orbitalsim.dir\view.cpp.obj -c E:\3C\EDA\Practice\Repo\code\view.cpp
 
 CMakeFiles/orbitalsim.dir/view.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/orbitalsim.dir/view.cpp.i"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "E:\3C\EDA\Practice\Repo\Starter Code\view.cpp" > CMakeFiles\orbitalsim.dir\view.cpp.i
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E E:\3C\EDA\Practice\Repo\code\view.cpp > CMakeFiles\orbitalsim.dir\view.cpp.i
 
 CMakeFiles/orbitalsim.dir/view.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/orbitalsim.dir/view.cpp.s"
-	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "E:\3C\EDA\Practice\Repo\Starter Code\view.cpp" -o CMakeFiles\orbitalsim.dir\view.cpp.s
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\3C\EDA\Practice\Repo\code\view.cpp -o CMakeFiles\orbitalsim.dir\view.cpp.s
 
 # Object files for target orbitalsim
 orbitalsim_OBJECTS = \
@@ -139,6 +139,6 @@ CMakeFiles/orbitalsim.dir/clean:
 .PHONY : CMakeFiles/orbitalsim.dir/clean
 
 CMakeFiles/orbitalsim.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "E:\3C\EDA\Practice\Repo\Starter Code" "E:\3C\EDA\Practice\Repo\Starter Code" E:\3C\EDA\Practice\Repo\build E:\3C\EDA\Practice\Repo\build E:\3C\EDA\Practice\Repo\build\CMakeFiles\orbitalsim.dir\DependInfo.cmake "--color=$(COLOR)"
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" E:\3C\EDA\Practice\Repo\code E:\3C\EDA\Practice\Repo\code E:\3C\EDA\Practice\Repo\build E:\3C\EDA\Practice\Repo\build E:\3C\EDA\Practice\Repo\build\CMakeFiles\orbitalsim.dir\DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/orbitalsim.dir/depend
 
