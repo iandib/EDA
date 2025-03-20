@@ -1,7 +1,5 @@
 CMakeFiles/orbitalsim.dir/main.cpp.obj: \
- E:\3C\EDA\Practice\Repo\code\main.cpp \
- E:\3C\EDA\Practice\Repo\code\OrbitalSim.h \
- C:/msys64/mingw64/include/raylib.h \
+ E:\3C\EDA\Practice\Repo\code\main.cpp C:/msys64/mingw64/include/raylib.h \
  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h \
  C:/msys64/mingw64/include/stdarg.h \
  C:/msys64/mingw64/include/_mingw_stdarg.h \
@@ -9,6 +7,7 @@ CMakeFiles/orbitalsim.dir/main.cpp.obj: \
  C:/msys64/mingw64/include/_mingw_mac.h \
  C:/msys64/mingw64/include/_mingw_secapi.h \
  C:/msys64/mingw64/include/sdks/_mingw_ddk.h \
+ E:\3C\EDA\Practice\Repo\code\OrbitalSim.h \
  C:/msys64/mingw64/include/raymath.h \
  C:/msys64/mingw64/include/c++/14.2.0/math.h \
  C:/msys64/mingw64/include/c++/14.2.0/cmath \

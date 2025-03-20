@@ -1,33 +1,46 @@
 ﻿/**
  * @brief Orbital simulation main module
- * @author Marc S. Ressl
+ * @author Marc S. Ressl (modificado)
  *
  * @copyright Copyright (c) 2022-2023
  */
 
-#include "OrbitalSim.h"
-#include "View.h"
-
-#define SECONDS_PER_DAY 86400
-
-int main()
-{
-    int fps = 60;                                 // Frames per second
-    float timeMultiplier = 100 * SECONDS_PER_DAY; // Simulation speed: 100 days per simulation second
-    float timeStep = timeMultiplier / fps;
-
-    OrbitalSim *sim = constructOrbitalSim(timeStep);
-    View *view = constructView(fps);
-
-    while (isViewRendering(view))
-    {
-        updateOrbitalSim(sim);
-
-        renderView(view, sim);
-    }
-
-    destroyView(view);
-    destroyOrbitalSim(sim);
-
-    return 0;
-}
+ #include "raylib.h"
+ #include "OrbitalSim.h"
+ #include "View.h"
+ 
+ #define SECONDS_PER_DAY 86400
+ #define FPS 60
+ 
+ int main()
+ {
+     // Configuración de la simulación
+     float timeMultiplier = 100 * SECONDS_PER_DAY; // 100 días por segundo de simulación
+     float timeStep = timeMultiplier / FPS;
+ 
+     // Inicialización de la ventana
+     InitWindow(1280, 720, "Sistema Solar con Barnes-Hut");
+     SetTargetFPS(FPS);
+ 
+     // Construcción de la simulación
+     OrbitalSim *sim = constructOrbitalSim(timeStep);
+ 
+     // Bucle principal
+     while (!WindowShouldClose())    // Detecta la tecla ESC o cierre de ventana
+     {
+         // Actualizar simulación
+         updateOrbitalSim(sim);
+ 
+         // Renderizado
+         BeginDrawing();
+             ClearBackground(BLACK);
+             renderView(sim);
+         EndDrawing();
+     }
+ 
+     // Limpieza
+     destroyOrbitalSim(sim);
+     CloseWindow();
+ 
+     return 0;
+ }

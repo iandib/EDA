@@ -1,6 +1,6 @@
 /**
  * @brief Orbital simulation
- * @author Marc S. Ressl
+ * @author Marc S. Ressl (modificado)
  *
  * @copyright Copyright (c) 2022-2023
  */
@@ -8,25 +8,16 @@
 // Enables M_PI #define in Windows
 #define _USE_MATH_DEFINES
 
-#include <iostream>
-using namespace std;
-
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "OrbitalSim.h"
 #include "ephemerides.h"
 
-// Factor de conversión interno para números grandes
-#define INTERNAL_SCALE 1.0E-10F  // Convertir metros a unidades internas
-#define INTERNAL_TIME_SCALE 86400.0F  // Convertir segundos a días
-
-// Ajustar la constante gravitacional para las unidades internas
-#define INTERNAL_G (GRAVITATIONAL_CONSTANT * INTERNAL_TIME_SCALE * INTERNAL_TIME_SCALE / INTERNAL_SCALE)
-
 #define GRAVITATIONAL_CONSTANT 6.6743E-11F
 #define ASTEROIDS_MEAN_RADIUS 4E11F
-#define ASTEROID_COUNT 50
+#define NUM_ASTEROIDS 500  // Número de asteroides a simular
 
 /**
  * @brief Gets a uniform random value in a range
@@ -52,30 +43,264 @@ void configureAsteroid(OrbitalBody *body, float centerMass)
     float x = getRandomFloat(0, 1);
     float l = logf(x) - logf(1 - x) + 1;
 
-    // Reescalar el radio medio de los asteroides
-    float scaledRadius = ASTEROIDS_MEAN_RADIUS * INTERNAL_SCALE;
-    
-    // Calcular posición
-    float r = scaledRadius * sqrtf(fabsf(l));
+    // https://mathworld.wolfram.com/DiskPointPicking.html
+    float r = ASTEROIDS_MEAN_RADIUS * sqrtf(fabsf(l));
     float phi = getRandomFloat(0, 2.0F * (float)M_PI);
 
-    // Calcular velocidad orbital (ajustada para unidades internas)
-    // v = sqrt(G*M/r) pero con G ajustado para nuestras unidades internas
-    float v = sqrtf(INTERNAL_G * centerMass / r) * getRandomFloat(0.6F, 1.2F);
-    float vy = getRandomFloat(-1E2F, 1E2F) * INTERNAL_SCALE * INTERNAL_TIME_SCALE;
+    // Surprise!
+    // phi = 0;
 
-    body->mass = 1E12F;  // masa en kg
-    body->radius = 2E3F; // radio en metros
+    // https://en.wikipedia.org/wiki/Circular_orbit#Velocity
+    float v = sqrtf(GRAVITATIONAL_CONSTANT * centerMass / r) * getRandomFloat(0.6F, 1.2F);
+    float vy = getRandomFloat(-1E2F, 1E2F);
+
+    // Completamos los campos con nuestros propios valores
+    body->mass = 1E12F;  // Masa típica de asteroide: 1 billón de toneladas
+    body->radius = 2E3F; // Radio típico de asteroide: 2km
     body->color = GRAY;
+    body->position = (Vector3){r * cosf(phi), 0, r * sinf(phi)};
+    body->velocity = (Vector3){-v * sinf(phi), vy, v * cosf(phi)};
+}
+
+// ----- Funciones auxiliares para el algoritmo de Barnes-Hut -----
+
+/**
+ * @brief Crea un nuevo nodo del octree
+ * 
+ * @param position Posición central del nodo
+ * @param size Tamaño del nodo
+ * @return Puntero al nuevo nodo
+ */
+OctreeNode* createNode(Vector3 position, float size)
+{
+    OctreeNode* node = (OctreeNode*)malloc(sizeof(OctreeNode));
     
-    // Posición en unidades internas
-    body->position = {r * cosf(phi), 0, r * sinf(phi)};
+    node->position = position;
+    node->size = size;
+    node->totalMass = 0.0f;
+    node->centerOfMass = (Vector3){0.0f, 0.0f, 0.0f};
+    node->isLeaf = true;
+    node->body = NULL;
     
-    // Velocidad en unidades internas/día
-    body->velocity = {-v * sinf(phi), vy, v * cosf(phi)};
+    for (int i = 0; i < 8; i++) {
+        node->children[i] = NULL;
+    }
     
-    // Aceleración inicial
-    body->acceleration = {0.0f, 0.0f, 0.0f};
+    return node;
+}
+
+/**
+ * @brief Libera la memoria de un nodo y sus hijos recursivamente
+ * 
+ * @param node Nodo a liberar
+ */
+void destroyNode(OctreeNode* node)
+{
+    if (node == NULL)
+        return;
+        
+    for (int i = 0; i < 8; i++) {
+        if (node->children[i] != NULL) {
+            destroyNode(node->children[i]);
+        }
+    }
+    
+    free(node);
+}
+
+/**
+ * @brief Determina el octante al que pertenece un punto respecto a un nodo
+ * 
+ * @param nodePos Posición del nodo
+ * @param bodyPos Posición del cuerpo
+ * @return Índice del octante (0-7)
+ */
+int getOctant(Vector3 nodePos, Vector3 bodyPos)
+{
+    int octant = 0;
+    if (bodyPos.x >= nodePos.x) octant |= 1;  // Bit 0: x >= centro
+    if (bodyPos.y >= nodePos.y) octant |= 2;  // Bit 1: y >= centro
+    if (bodyPos.z >= nodePos.z) octant |= 4;  // Bit 2: z >= centro
+    return octant;
+}
+
+/**
+ * @brief Obtiene la posición central de un octante específico
+ * 
+ * @param nodePos Posición del nodo padre
+ * @param octant Índice del octante (0-7)
+ * @param halfSize Mitad del tamaño del nodo padre
+ * @return Posición central del octante
+ */
+Vector3 getOctantPosition(Vector3 nodePos, int octant, float halfSize)
+{
+    Vector3 pos = nodePos;
+    
+    if (octant & 1) pos.x += halfSize; else pos.x -= halfSize;  // Bit 0: x
+    if (octant & 2) pos.y += halfSize; else pos.y -= halfSize;  // Bit 1: y
+    if (octant & 4) pos.z += halfSize; else pos.z -= halfSize;  // Bit 2: z
+    
+    return pos;
+}
+
+/**
+ * @brief Inserta un cuerpo en el octree
+ * 
+ * @param node Nodo actual del octree
+ * @param body Cuerpo a insertar
+ */
+void insertBody(OctreeNode* node, OrbitalBody* body)
+{
+    // Si el nodo está vacío, asignamos directamente el cuerpo
+    if (node->totalMass == 0) {
+        node->body = body;
+        node->totalMass = body->mass;
+        node->centerOfMass = body->position;
+        return;
+    }
+    
+    // Actualizamos el centro de masa y la masa total del nodo
+    float newTotalMass = node->totalMass + body->mass;
+    node->centerOfMass.x = (node->centerOfMass.x * node->totalMass + body->position.x * body->mass) / newTotalMass;
+    node->centerOfMass.y = (node->centerOfMass.y * node->totalMass + body->position.y * body->mass) / newTotalMass;
+    node->centerOfMass.z = (node->centerOfMass.z * node->totalMass + body->position.z * body->mass) / newTotalMass;
+    node->totalMass = newTotalMass;
+    
+    // Si es un nodo hoja con un cuerpo, subdividimos
+    if (node->isLeaf && node->body != NULL) {
+        // Guardamos el cuerpo actual
+        OrbitalBody* oldBody = node->body;
+        node->body = NULL;
+        node->isLeaf = false;
+        
+        // Determinar en qué octante insertar el cuerpo antiguo
+        int octant = getOctant(node->position, oldBody->position);
+        float halfSize = node->size / 2.0f;
+        
+        // Crear el octante si no existe
+        if (node->children[octant] == NULL) {
+            Vector3 childPos = getOctantPosition(node->position, octant, halfSize / 2.0f);
+            node->children[octant] = createNode(childPos, halfSize);
+        }
+        
+        // Insertar el cuerpo antiguo en su octante
+        insertBody(node->children[octant], oldBody);
+    }
+    
+    // Insertar el nuevo cuerpo en su octante correspondiente
+    if (!node->isLeaf) {
+        int octant = getOctant(node->position, body->position);
+        float halfSize = node->size / 2.0f;
+        
+        // Crear el octante si no existe
+        if (node->children[octant] == NULL) {
+            Vector3 childPos = getOctantPosition(node->position, octant, halfSize / 2.0f);
+            node->children[octant] = createNode(childPos, halfSize);
+        }
+        
+        // Insertar el cuerpo en su octante
+        insertBody(node->children[octant], body);
+    }
+}
+
+/**
+ * @brief Construye el octree para la simulación
+ * 
+ * @param sim Simulación orbital
+ * @return Raíz del octree
+ */
+OctreeNode* buildOctree(OrbitalSim* sim)
+{
+    // Encontrar los límites del espacio
+    Vector3 min = sim->bodies[0].position;
+    Vector3 max = sim->bodies[0].position;
+    
+    for (int i = 1; i < sim->bodyCount; i++) {
+        Vector3 pos = sim->bodies[i].position;
+        
+        // Actualizar mínimos
+        if (pos.x < min.x) min.x = pos.x;
+        if (pos.y < min.y) min.y = pos.y;
+        if (pos.z < min.z) min.z = pos.z;
+        
+        // Actualizar máximos
+        if (pos.x > max.x) max.x = pos.x;
+        if (pos.y > max.y) max.y = pos.y;
+        if (pos.z > max.z) max.z = pos.z;
+    }
+    
+    // Calcular el centro y tamaño del octree
+    Vector3 center = {
+        (min.x + max.x) / 2.0f,
+        (min.y + max.y) / 2.0f,
+        (min.z + max.z) / 2.0f
+    };
+    
+    // Buscar el tamaño máximo en cualquier dimensión
+    float size = max.x - min.x;
+    if (max.y - min.y > size) size = max.y - min.y;
+    if (max.z - min.z > size) size = max.z - min.z;
+    
+    // Añadir margen para asegurar que todos los cuerpos estén dentro
+    size *= 1.1f;
+    
+    // Crear el nodo raíz
+    OctreeNode* root = createNode(center, size);
+    
+    // Insertar todos los cuerpos
+    for (int i = 0; i < sim->bodyCount; i++) {
+        insertBody(root, &sim->bodies[i]);
+    }
+    
+    return root;
+}
+
+/**
+ * @brief Calcula la aceleración de un cuerpo usando el algoritmo Barnes-Hut
+ * 
+ * @param node Nodo actual del octree
+ * @param body Cuerpo para el cual calcular la aceleración
+ * @param acceleration Vector de aceleración a actualizar
+ * @param theta Parámetro de precisión
+ */
+void calculateAcceleration(OctreeNode* node, OrbitalBody* body, Vector3* acceleration, float theta)
+{
+    // Si el nodo está vacío, no hay fuerza
+    if (node->totalMass == 0) {
+        return;
+    }
+    
+    // Calcular vector de distancia al centro de masa del nodo
+    Vector3 distanceVec = Vector3Subtract(node->centerOfMass, body->position);
+    float distance = Vector3Length(distanceVec);
+    
+    // Evitar auto-interacción y división por cero
+    if (distance < 1e-6f) {
+        return;
+    }
+    
+    // Criterio de apertura: s/d < theta
+    // donde s: tamaño del nodo, d: distancia al centro de masa
+    if (node->isLeaf || (node->size / distance < theta)) {
+        // Tratar el nodo como una única partícula
+        
+        // Calcular magnitud de la fuerza gravitacional (G*m1*m2/d^2)
+        float forceMagnitude = GRAVITATIONAL_CONSTANT * node->totalMass / (distance * distance);
+        
+        // Convertir a aceleración (F/m = G*m2/d^2)
+        Vector3 unitDir = Vector3Normalize(distanceVec);
+        Vector3 accelContribution = Vector3Scale(unitDir, forceMagnitude);
+        
+        // Acumular la aceleración
+        *acceleration = Vector3Add(*acceleration, accelContribution);
+    } else {
+        // El nodo no cumple el criterio, recorrer sus hijos
+        for (int i = 0; i < 8; i++) {
+            if (node->children[i] != NULL) {
+                calculateAcceleration(node->children[i], body, acceleration, theta);
+            }
+        }
+    }
 }
 
 /**
@@ -83,54 +308,54 @@ void configureAsteroid(OrbitalBody *body, float centerMass)
  *
  * @param timeStep The time step
  * @return The orbital simulation
- */OrbitalSim *constructOrbitalSim(float timeStep)
+ */
+OrbitalSim* constructOrbitalSim(float timeStep)
 {
-    // Crear una nueva instancia de OrbitalSim
-    OrbitalSim *sim = new OrbitalSim;
+    OrbitalSim* sim = (OrbitalSim*)malloc(sizeof(OrbitalSim));
+    if (!sim)
+        return NULL;
     
-    // Configurar el timeStep y el tiempo inicial
-    // Convertir el timestep de segundos a días para la simulación interna
-    sim->timeStep = timeStep / INTERNAL_TIME_SCALE;
-    sim->elapsedTime = 0.0f;
+    // Inicializar parámetros de la simulación
+    sim->timeStep = timeStep;
+    sim->time = 0.0f;
+    sim->theta = 0.5f;  // Valor típico para precisión/velocidad en Barnes-Hut
     
-    // Decidir qué sistema usar
-    EphemeridesBody* selectedSystem = solarSystem;
-    int systemBodyCount = SOLARSYSTEM_BODYNUM;
+    // Contar cuerpos en el sistema solar
+    int solarSystemCount = 0;
+    while (solarSystem[solarSystemCount].name != NULL)
+        solarSystemCount++;
     
-    // Configurar los cuerpos del sistema
-    sim->bodyCount = systemBodyCount + ASTEROID_COUNT;
-    sim->bodies = new OrbitalBody[sim->bodyCount];
+    // Reservar memoria para todos los cuerpos (sistema solar + asteroides)
+    sim->bodyCount = solarSystemCount + NUM_ASTEROIDS;
+    sim->bodies = (OrbitalBody*)malloc(sim->bodyCount * sizeof(OrbitalBody));
     
-    // Inicializar los cuerpos celestes del sistema
-    for (int i = 0; i < systemBodyCount; i++) {
-        // Reescalar las posiciones internamente
-        sim->bodies[i].position.x = selectedSystem[i].position.x * INTERNAL_SCALE;
-        sim->bodies[i].position.y = selectedSystem[i].position.y * INTERNAL_SCALE;
-        sim->bodies[i].position.z = selectedSystem[i].position.z * INTERNAL_SCALE;
-        
-        // Reescalar las velocidades (m/s a unidades internas/día)
-        sim->bodies[i].velocity.x = selectedSystem[i].velocity.x * INTERNAL_SCALE * INTERNAL_TIME_SCALE;
-        sim->bodies[i].velocity.y = selectedSystem[i].velocity.y * INTERNAL_SCALE * INTERNAL_TIME_SCALE;
-        sim->bodies[i].velocity.z = selectedSystem[i].velocity.z * INTERNAL_SCALE * INTERNAL_TIME_SCALE;
-        
-        // Inicializar aceleración
-        sim->bodies[i].acceleration = {0.0f, 0.0f, 0.0f};
-        
-        // Copiar masa, radio y color sin cambios
-        sim->bodies[i].mass = selectedSystem[i].mass;
-        sim->bodies[i].radius = selectedSystem[i].radius;
-        sim->bodies[i].color = selectedSystem[i].color;
-        
-        // ? Depuración: mostrar valores reescalados
-        //cout << "Cuerpo " << i << " (" << selectedSystem[i].name << "):" << endl;
-        //cout << "  Posición reescalada: (" << sim->bodies[i].position.x << ", " 
-             //<< sim->bodies[i].position.y << ", " << sim->bodies[i].position.z << ")" << endl;
+    if (!sim->bodies) {
+        free(sim);
+        return NULL;
     }
     
-    // Inicializar asteroides con las nuevas unidades internas
-    for (int i = 0; i < ASTEROID_COUNT; i++) {
-        int index = systemBodyCount + i;
-        configureAsteroid(&sim->bodies[index], selectedSystem[0].mass);
+    // Copiar los cuerpos del sistema solar
+    for (int i = 0; i < solarSystemCount; i++) {
+        sim->bodies[i].name = strdup(solarSystem[i].name);
+        sim->bodies[i].mass = solarSystem[i].mass;
+        sim->bodies[i].radius = solarSystem[i].radius;
+        sim->bodies[i].color = solarSystem[i].color;
+        sim->bodies[i].position = solarSystem[i].position;
+        sim->bodies[i].velocity = solarSystem[i].velocity;
+    }
+    
+    // Encontrar el cuerpo más masivo (generalmente el Sol)
+    float centerMass = 0.0f;
+    for (int i = 0; i < solarSystemCount; i++) {
+        if (sim->bodies[i].mass > centerMass) {
+            centerMass = sim->bodies[i].mass;
+        }
+    }
+    
+    // Configurar los asteroides
+    for (int i = 0; i < NUM_ASTEROIDS; i++) {
+        sim->bodies[solarSystemCount + i].name = NULL;  // Los asteroides no tienen nombre
+        configureAsteroid(&sim->bodies[solarSystemCount + i], centerMass);
     }
     
     return sim;
@@ -138,120 +363,73 @@ void configureAsteroid(OrbitalBody *body, float centerMass)
 
 /**
  * @brief Destroys an orbital simulation
- * 
- * @param sim The orbital simulation to destroy
  */
-void destroyOrbitalSim(OrbitalSim *sim)
+void destroyOrbitalSim(OrbitalSim* sim)
 {
-    if (sim != NULL) {
-        // Liberar la memoria del arreglo de cuerpos
-        if (sim->bodies != NULL) {
-            delete[] sim->bodies;
-            sim->bodies = NULL;
+    if (sim == NULL)
+        return;
+    
+    // Liberar memoria de los nombres de los cuerpos
+    for (int i = 0; i < sim->bodyCount; i++) {
+        if (sim->bodies[i].name != NULL) {
+            free((void*)sim->bodies[i].name);
         }
-        
-        // Liberar la memoria de la estructura principal
-        delete sim;
     }
+    
+    // Liberar el arreglo de cuerpos
+    free(sim->bodies);
+    
+    // Liberar la estructura de simulación
+    free(sim);
 }
 
 /**
  * @brief Simulates a timestep
  *
  * @param sim The orbital simulation
- */void updateOrbitalSim(OrbitalSim *sim)
+ */
+void updateOrbitalSim(OrbitalSim* sim)
 {
-    if (sim == NULL)
+    if (sim == NULL || sim->bodyCount == 0)
         return;
     
-    // 1. Calcular las aceleraciones
+    // Construir el octree para la simulación (algoritmo Barnes-Hut)
+    OctreeNode* root = buildOctree(sim);
+    
+    // Arreglo temporal para almacenar las aceleraciones
+    Vector3* accelerations = (Vector3*)malloc(sim->bodyCount * sizeof(Vector3));
+    
+    // PASO 1: Calcular todas las aceleraciones
     for (int i = 0; i < sim->bodyCount; i++) {
-        // Reiniciar la aceleración
-        sim->bodies[i].acceleration = {0.0f, 0.0f, 0.0f};
+        // Inicializar aceleración a cero
+        accelerations[i] = (Vector3){0.0f, 0.0f, 0.0f};
         
-        // Calcular la fuerza gravitacional de todos los demás cuerpos
-        for (int j = 0; j < sim->bodyCount; j++) {
-            if (i == j)
-                continue;
-            
-            // Vector de posición relativa
-            Vector3 relativePos = Vector3Subtract(sim->bodies[j].position, sim->bodies[i].position);
-            
-            // Distancia entre los cuerpos
-            float distance = Vector3Length(relativePos);
-            
-            // Evitar divisiones por cero o distancias muy pequeñas
-            if (distance < 1e-4f)
-                continue;
-            
-            // Dirección unitaria de la fuerza
-            Vector3 direction = Vector3Normalize(relativePos);
-            
-            // Magnitud de la fuerza usando G ajustado para unidades internas
-            float forceMagnitude = INTERNAL_G * sim->bodies[i].mass * sim->bodies[j].mass / 
-                                  (distance * distance);
-            
-            // Aceleración
-            float accelerationMagnitude = forceMagnitude / sim->bodies[i].mass;
-            
-            // Añadir a la aceleración total
-            Vector3 acceleration = Vector3Scale(direction, accelerationMagnitude);
-            sim->bodies[i].acceleration = Vector3Add(sim->bodies[i].acceleration, acceleration);
-        }
-        
-        // Verificar si la aceleración es válida
-        if (isnan(sim->bodies[i].acceleration.x) || isnan(sim->bodies[i].acceleration.y) || 
-            isnan(sim->bodies[i].acceleration.z)) {
-
-            // ! ACÁ HAY UN ERROR, SALTA LA ADVERTENCIA PARA TODOS LOS CUERPOS
-            // cout << "¡Advertencia! Aceleración inválida para cuerpo " << i << endl;
-
-            sim->bodies[i].acceleration = {0.0f, 0.0f, 0.0f};
-        }
+        // Calcular aceleración usando el algoritmo Barnes-Hut
+        calculateAcceleration(root, &sim->bodies[i], &accelerations[i], sim->theta);
     }
     
-    // ! OJO Creo que estas no son las ecuaciones que hay que usar
-    // Primer medio paso: actualizar velocidades usando la aceleración actual
+    // PASO 2: Actualizar velocidades con las aceleraciones calculadas
     for (int i = 0; i < sim->bodyCount; i++) {
-        Vector3 halfDeltaV = Vector3Scale(sim->bodies[i].acceleration, sim->timeStep * 0.5f);
-        sim->bodies[i].velocity = Vector3Add(sim->bodies[i].velocity, halfDeltaV);
+        // v_i(n+1) = v_i(n) + a_i(n) * Δt
+        sim->bodies[i].velocity = Vector3Add(
+            sim->bodies[i].velocity, 
+            Vector3Scale(accelerations[i], sim->timeStep)
+        );
     }
     
-    // Actualizar posiciones con las velocidades de medio paso
+    // PASO 3: Actualizar posiciones con las nuevas velocidades
     for (int i = 0; i < sim->bodyCount; i++) {
-        Vector3 deltaX = Vector3Scale(sim->bodies[i].velocity, sim->timeStep);
-        sim->bodies[i].position = Vector3Add(sim->bodies[i].position, deltaX);
-        
-        // Verificar si la posición es válida
-        if (isnan(sim->bodies[i].position.x) || isnan(sim->bodies[i].position.y) || 
-            isnan(sim->bodies[i].position.z)) {
-            cout << "¡Advertencia! Posición inválida para cuerpo " << i << endl;
-            if (i == 0) {
-                sim->bodies[i].position = {0.0f, 0.0f, 0.0f}; // Origen para el Sol
-            } else {
-                // Posición segura relativa al Sol
-                sim->bodies[i].position = Vector3Add(sim->bodies[0].position, 
-                                                    (Vector3){(float)i * 0.1f, 0.0f, 0.0f});
-            }
-        }
+        // x_i(n+1) = x_i(n) + v_i(n+1) * Δt
+        sim->bodies[i].position = Vector3Add(
+            sim->bodies[i].position, 
+            Vector3Scale(sim->bodies[i].velocity, sim->timeStep)
+        );
     }
     
-    // Recalcular aceleraciones con las nuevas posiciones
-    // TODO Repetir el código de arriba para calcular aceleraciones
+    // Actualizar el tiempo de simulación
+    sim->time += sim->timeStep;
     
-    // Segundo medio paso: completar la actualización de velocidades
-    for (int i = 0; i < sim->bodyCount; i++) {
-        Vector3 halfDeltaV = Vector3Scale(sim->bodies[i].acceleration, sim->timeStep * 0.5f);
-        sim->bodies[i].velocity = Vector3Add(sim->bodies[i].velocity, halfDeltaV);
-        
-        // Verificar si la velocidad es válida
-        if (isnan(sim->bodies[i].velocity.x) || isnan(sim->bodies[i].velocity.y) || 
-            isnan(sim->bodies[i].velocity.z)) {
-            cout << "¡Advertencia! Velocidad inválida para cuerpo " << i << endl;
-            sim->bodies[i].velocity = {0.0f, 0.0f, 0.0f};
-        }
-    }
-    
-    // Actualizar el tiempo total (en segundos para interfaz externa)
-    sim->elapsedTime += sim->timeStep * INTERNAL_TIME_SCALE;
+    // Liberar memoria temporal
+    free(accelerations);
+    destroyNode(root);
 }
