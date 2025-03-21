@@ -20,18 +20,38 @@
     /// @brief Orbital body definition
     struct OrbitalBody
     {
-        // TODO Complete the structure definition
-
-
+        const char *name;
+        float mass;         // [kg]
+        float radius;       // [m]
+        Color color;        // Raylib color
+        Vector3 position;   // [m]
+        Vector3 velocity;   // [m/s]
     };
 
 
     /// @brief Orbital simulation definition
     struct OrbitalSim
     {
-        // TODO Complete the structure definition
+        float timeStep;     // [s]
+        float time;         // Total elapsed time [s]
+        int bodyCount;
+        OrbitalBody* bodies;
+        // Barnes-Hut precision parameter (typically 0.5)
+        float theta;
+    };
 
 
+    // Octree node structure for Barnes-Hut
+    struct OctreeNode 
+    {
+        Vector3 centerOfMass;
+        float totalMass;
+        Vector3 position;
+        float size;
+        struct OctreeNode* children[8]; // 8 octants
+        // Reference to the body (only for leaf nodes)
+        OrbitalBody* body;
+        bool isLeaf;
     };
 
 
