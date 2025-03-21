@@ -1,0 +1,20 @@
+[
+{
+  "directory": "E:/3C/EDA/Practice/Repo/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe   -g -std=gnu++11 -o CMakeFiles\\orbitalsim.dir\\main.cpp.obj -c E:\\3C\\EDA\\Practice\\Repo\\code\\main.cpp",
+  "file": "E:/3C/EDA/Practice/Repo/code/main.cpp",
+  "output": "CMakeFiles/orbitalsim.dir/main.cpp.obj"
+},
+{
+  "directory": "E:/3C/EDA/Practice/Repo/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe   -g -std=gnu++11 -o CMakeFiles\\orbitalsim.dir\\orbitalSim.cpp.obj -c E:\\3C\\EDA\\Practice\\Repo\\code\\orbitalSim.cpp",
+  "file": "E:/3C/EDA/Practice/Repo/code/orbitalSim.cpp",
+  "output": "CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj"
+},
+{
+  "directory": "E:/3C/EDA/Practice/Repo/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe   -g -std=gnu++11 -o CMakeFiles\\orbitalsim.dir\\view.cpp.obj -c E:\\3C\\EDA\\Practice\\Repo\\code\\view.cpp",
+  "file": "E:/3C/EDA/Practice/Repo/code/view.cpp",
+  "output": "CMakeFiles/orbitalsim.dir/view.cpp.obj"
+}
+]
