@@ -3,7 +3,7 @@
    ***************************************************************** */
    
 /// @brief
-/// @author Marc S. Ressl, Ian A. Dib, Luciano Cordero
+/// @author Marc S. Ressl, Ian A. Dib, Luciano S. Cordero
 /// @copyright Copyright (c) 2022-2023
 
 
@@ -13,6 +13,7 @@
 
    #ifndef NAME_H
    #define NAME_H
+   
    
    //* NECESSARY LIBRARIES
    

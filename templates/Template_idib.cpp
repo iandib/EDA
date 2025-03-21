@@ -3,7 +3,7 @@
    ***************************************************************** */
    
 /// @brief 
-/// @author Marc S. Ressl, Ian A. Dib, Luciano Cordero
+/// @author Marc S. Ressl, Ian A. Dib, Luciano S. Cordero
 /// @copyright Copyright (c) 2022-2023
 
 
@@ -29,7 +29,7 @@
 
 
 /* *****************************************************************
-    * MAIN LOGIC *
+    * LOGIC MODULES *
    ***************************************************************** */
 
     /// @brief

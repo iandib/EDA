@@ -21,7 +21,7 @@
     #include "raymath.h"
 
 
-    //* MACROS, CONSTANTS & STRUCTURES
+    //* CONSTANTS & STRUCTURES
 
     #define SOLARSYSTEM_BODYNUM (sizeof(solarSystem) / sizeof(EphemeridesBody))
     #define ALPHACENTAURISYSTEM_BODYNUM (sizeof(alphaCentauriSystem) / sizeof(EphemeridesBody))
@@ -41,7 +41,6 @@
 
     /// @brief Solay system ephermerides for 2022-01-01T00:00:00Z
     /// @cite https://ssd.jpl.nasa.gov/horizons/app.html#/
-
     EphemeridesBody solarSystem[] = 
     {
         {
@@ -121,7 +120,6 @@
 
     /// @brief Alpha Centauri system ephermerides for 2022-01-01T00:00:00Z
     /// @cite https://ssd.jpl.nasa.gov/horizons/app.html#/
-
     EphemeridesBody alphaCentauriSystem[] = 
     {
         {
