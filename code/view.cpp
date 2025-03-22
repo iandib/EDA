@@ -132,7 +132,6 @@
             DrawSphere(scaledPosition, visualRadius, sim->bodies[i].color);
             
             // Draw a point for distant objects to ensure visibility
-            // This addresses the requirement in the guide
             DrawPoint3D(scaledPosition, sim->bodies[i].color);
         }
 
@@ -143,7 +142,6 @@
 
         //* 2D DRAWING CODE
         
-        // Show FPS as mentioned in the guide
         DrawFPS(UI_MARGIN, UI_MARGIN);
         
         // Show simulation date using the provided getISODate function
