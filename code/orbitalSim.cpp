@@ -82,7 +82,7 @@
     }
 
 
-    //* GRAVITATIONAL FORCE CALCULATION MODULES *
+    //* GRAVITATIONAL FORCE CALCULATION MODULES
 
     /// @brief Calculates the gravitational force between two bodies
     /// @param pos1 Position of first body
@@ -104,8 +104,7 @@
             return {0, 0, 0};
         }
         
-        // Normalize direction (unit vector)
-        Vector3 unitDirection = Vector3Scale(direction, 1.0f / distance);
+        Vector3 unitDirection = Vector3Normalize(direction);
         
         // Calculate force magnitude using Newton's law of gravitation
         // F = G * m1 * m2 / r^2
@@ -115,67 +114,8 @@
         return Vector3Scale(unitDirection, forceMagnitude);
     }
 
-    /// @brief Calculates the force on a body from a node in the octree
-    /// @param body Body to calculate force for
-    /// @param node Node in the octree
-    /// @param theta Barnes-Hut approximation parameter
-    /// @return Force vector
-    Vector3 calculateForceFromNode(OrbitalBody* body, OctreeNode* node, float theta) 
-    {
-        // If node is empty, no force
-        if (node->totalMass == 0) {
-            return {0, 0, 0};
-        }
-        
-        // Calculate the direction and distance to the node's center of mass
-        Vector3 direction = Vector3Subtract(node->centerOfMass, body->position);
-        float distance = Vector3Length(direction);
-        
-        // If distance is zero, no force (avoid division by zero)
-        if (distance < 1.0f) {
-            return {0, 0, 0};
-        }
-        
-        // If this is a leaf node with a body, calculate direct force
-        if (node->isLeaf && node->body != NULL) {
-            // Don't calculate force from body to itself
-            if (node->body == body) {
-                return {0, 0, 0};
-            }
-            
-            return calculateGravitationalForce(
-                body->position, body->mass,
-                node->body->position, node->body->mass
-            );
-        }
-        
-        // Check if we can use approximation
-        // If s/d < theta, where s is the size of the region and d is the distance
-        // to the center of mass, we can treat the node as a single body
-        if (node->size / distance < theta) {
-            return calculateGravitationalForce(
-                body->position, body->mass,
-                node->centerOfMass, node->totalMass
-            );
-        }
-        
-        // Otherwise, recursively calculate forces from children
-        Vector3 totalForce = {0, 0, 0};
-        
-        for (int i = 0; i < 8; i++) {
-            if (node->children[i] != NULL) {
-                Vector3 force = calculateForceFromNode(body, node->children[i], theta);
-                totalForce = Vector3Add(totalForce, force);
-            }
-        }
-        
-        return totalForce;
-    }
-
-
-    /* *****************************************************************
-       * ORBITAL SIMULATION MANAGEMENT MODULES *
-       ***************************************************************** */
+    
+    //* ORBITAL SIMULATION MANAGEMENT MODULES
 
     /// @brief Constructs an orbital simulation
     /// @param timeStep Time step for integration
@@ -183,36 +123,33 @@
     OrbitalSim *constructOrbitalSim(float timeStep)
     {
         // Allocate memory for the simulation structure
-        OrbitalSim *sim = (OrbitalSim*)malloc(sizeof(OrbitalSim));
-        
-        if (sim == NULL) {
-            return NULL;
-        }
+        OrbitalSim *sim = new OrbitalSim;
         
         // Initialize fields
         sim->timeStep = timeStep;
         sim->time = 0.0f;
-        sim->theta = 0.5f; // Barnes-Hut precision parameter
         
         // Define the number of bodies (solar system + asteroids)
         sim->bodyCount = SOLARSYSTEM_BODYNUM + NUM_ASTEROIDS;
         
         // Allocate memory for the bodies
-        sim->bodies = (OrbitalBody*)malloc(sim->bodyCount * sizeof(OrbitalBody));
-        
-        if (sim->bodies == NULL) {
-            free(sim);
-            return NULL;
-        }
+        sim->bodies = new OrbitalBody[sim->bodyCount];
         
         // Copy solar system bodies from ephemerides
-        for (int i = 0; i < SOLARSYSTEM_BODYNUM; i++) {
-            sim->bodies[i] = solarSystem[i];
+        for (int i = 0; i < SOLARSYSTEM_BODYNUM; i++)
+        {
+            sim->bodies[i].velocity = solarSystem[i].velocity;
+            sim->bodies[i].position = solarSystem[i].position;
+            sim->bodies[i].color = solarSystem[i].color;
+            sim->bodies[i].mass = solarSystem[i].mass;
+            sim->bodies[i].radius = solarSystem[i].radius;
+            sim->bodies[i].name = solarSystem[i].name;
         }
         
         // Configure asteroids
         float centerMass = solarSystem[0].mass; // Sun's mass
-        for (int i = 0; i < NUM_ASTEROIDS; i++) {
+        for (int i = 0; i < NUM_ASTEROIDS; i++)
+        {
             OrbitalBody *body = &sim->bodies[SOLARSYSTEM_BODYNUM + i];
             body->name = "Asteroid";
             configureAsteroid(body, centerMass);
@@ -226,16 +163,6 @@
     /// @param sim The orbital simulation
     void destroyOrbitalSim(OrbitalSim *sim)
     {
-        if (sim == NULL) {
-            return;
-        }
-        
-        // Free the bodies array
-        if (sim->bodies != NULL) {
-            free(sim->bodies);
-        }
-        
-        // Free the simulation structure
         free(sim);
     }
 
@@ -244,52 +171,50 @@
     /// @param sim The orbital simulation
     void updateOrbitalSim(OrbitalSim *sim)
     {
-        if (sim == NULL || sim->bodies == NULL) {
-            return;
-        }
-        
-        /* *****************************************************************
-           * STEP 1: BUILD OCTREE *
-           ***************************************************************** */
-        OctreeNode* root = buildOctree(sim->bodies, sim->bodyCount);
-        
-        /* *****************************************************************
-           * STEP 2: CALCULATE ACCELERATIONS AND VELOCITIES FOR ALL BODIES *
-           ***************************************************************** */
+        //* VELOCITY AND ACCELERATION CALCULATION
+
         // Temporary array to store accelerations
-        Vector3 *accelerations = (Vector3*)malloc(sim->bodyCount * sizeof(Vector3));
+        Vector3 *accelerations = new Vector3[sim->bodyCount];
         
         // Calculate accelerations for all bodies
-        for (int i = 0; i < sim->bodyCount; i++) {
-            // Calculate force using Barnes-Hut algorithm
-            Vector3 force = calculateForceFromNode(&sim->bodies[i], root, sim->theta);
-            
+        for (int i = 1; i < sim->bodyCount; i++)
+        {
+            Vector3 netForce = {0, 0, 0};
+
+            for(int j = 0; j < sim->bodyCount; j++)
+            {
+                if (i != j)
+                {
+                    // Calculate gravitational force between bodies i and j
+                    Vector3 force = calculateGravitationalForce(sim->bodies[i].position, sim->bodies[i].mass, 
+                                                                sim->bodies[j].position, sim->bodies[j].mass);
+                    
+                    netForce = Vector3Add(netForce, force);
+                }
+            }
+
             // Calculate acceleration (F = ma, so a = F/m)
-            accelerations[i] = Vector3Scale(force, 1.0f / sim->bodies[i].mass);
+            accelerations[i] = Vector3Scale(netForce, 1.0f / sim->bodies[i].mass);
             
             // Update velocity using current acceleration (v(n+1) = v(n) + a(n) * dt)
-            sim->bodies[i].velocity = Vector3Add(
-                sim->bodies[i].velocity,
-                Vector3Scale(accelerations[i], sim->timeStep)
-            );
+            sim->bodies[i].velocity = Vector3Add(sim->bodies[i].velocity,
+                                                Vector3Scale(accelerations[i], sim->timeStep));
         }
         
-        /* *****************************************************************
-           * STEP 3: UPDATE POSITIONS FOR ALL BODIES *
-           ***************************************************************** */
+        //* POSITION UPDATE
+
         // Update positions using the new velocities
-        for (int i = 0; i < sim->bodyCount; i++) {
+        for (int i = 0; i < sim->bodyCount; i++)
+        {
             // Update position (x(n+1) = x(n) + v(n+1) * dt)
-            sim->bodies[i].position = Vector3Add(
-                sim->bodies[i].position,
-                Vector3Scale(sim->bodies[i].velocity, sim->timeStep)
-            );
+            sim->bodies[i].position = Vector3Add(sim->bodies[i].position,
+                                                Vector3Scale(sim->bodies[i].velocity, sim->timeStep));
         }
         
         // Clean up
         free(accelerations);
-        destroyOctree(root);
         
         // Update simulation time
         sim->time += sim->timeStep;
     }
+

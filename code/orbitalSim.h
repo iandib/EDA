@@ -13,8 +13,11 @@
 
    #ifndef ORBITALSIM_H
    #define ORBITALSIM_H
-   
-   
+
+   //* NECESSARY LIBRARIES
+   #include <raylib.h>
+   #include <raymath.h>
+
     //* CONSTANTS & STRUCTURES
    
     /// @brief Orbital body definition

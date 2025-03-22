@@ -22,8 +22,7 @@
     #define WINDOW_WIDTH 1280
     #define WINDOW_HEIGHT 720
 
-
-    //* PRIVATE FUNCTIONS PROTOTYPES
+    #define SCALE_FACTOR 1E-11
 
 
 /* *****************************************************************
@@ -107,9 +106,16 @@
 
         // TODO Complete this function with the 3D drawing code
 
+        for(int i = 0; i < sim->bodyCount; i++)
+        {
+            Vector3 scaledPosition = Vector3Scale(sim->bodies[i].position, SCALE_FACTOR);
+            DrawSphere(scaledPosition, 0.005F * logf(sim->bodies[i].radius), sim->bodies[i].color);
+        }
+
         DrawGrid(10, 10.0f);
         EndMode3D();
 
+        DrawFPS(10, 10);
         // TODO Complete this function with the 2D drawing code
 
         EndDrawing();
