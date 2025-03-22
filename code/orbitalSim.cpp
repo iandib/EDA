@@ -90,6 +90,7 @@
     /// @param pos2 Position of second body
     /// @param mass2 Mass of second body
     /// @return Gravitational force vector
+    //! EL ERROR EN EL CÁLCULO DE LA FUERZA DE GRAVEDAD DEBE ESTAR ACÁ
     Vector3 calculateGravitationalForce(Vector3 pos1, float mass1, Vector3 pos2, float mass2) 
     {
         // Calculate direction vector from pos1 to pos2
@@ -110,8 +111,8 @@
         // F = G * m1 * m2 / r^2
         float forceMagnitude = GRAVITATIONAL_CONSTANT * mass1 * mass2 / (distance * distance);
         
-        // Return force vector
-        return Vector3Scale(unitDirection, forceMagnitude);
+        // Return force vector with negative sign to make it attractive
+        return Vector3Scale(unitDirection, -forceMagnitude);
     }
 
     
@@ -163,7 +164,8 @@
     /// @param sim The orbital simulation
     void destroyOrbitalSim(OrbitalSim *sim)
     {
-        free(sim);
+        delete[] sim->bodies;
+        delete sim;
     }
 
 
@@ -176,8 +178,9 @@
         // Temporary array to store accelerations
         Vector3 *accelerations = new Vector3[sim->bodyCount];
         
+        //! ACÁ HAY UN ERROR, CON i=0 NO SE SIMULA NADA PERO CON i=7 LA GRAVEDAD NO SE CALCULA BIEN
         // Calculate accelerations for all bodies
-        for (int i = 1; i < sim->bodyCount; i++)
+        for (int i = 7; i < sim->bodyCount; i++)
         {
             Vector3 netForce = {0, 0, 0};
 
@@ -212,7 +215,7 @@
         }
         
         // Clean up
-        free(accelerations);
+        delete[] accelerations;
         
         // Update simulation time
         sim->time += sim->timeStep;
