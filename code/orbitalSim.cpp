@@ -30,7 +30,7 @@
     // Enables M_PI #define in Windows
     #define _USE_MATH_DEFINES
 
-    #define GRAVITATIONAL_CONSTANT 6.6743E-11F
+    #define GRAVITATIONAL_CONSTANT (6.6743E-11L)
     #define ASTEROIDS_MEAN_RADIUS 4E11F
 
     // Number of asteroids to generate
@@ -112,7 +112,9 @@
         float forceMagnitude = GRAVITATIONAL_CONSTANT * mass1 * mass2 / (distance * distance);
         
         // Return force vector with negative sign to make it attractive
-        return Vector3Scale(unitDirection, -forceMagnitude);
+        auto ret = Vector3Scale(unitDirection, forceMagnitude);
+
+        return ret;
     }
 
     
@@ -180,10 +182,12 @@
         
         //! ACÁ HAY UN ERROR, CON i=0 NO SE SIMULA NADA PERO CON i=7 LA GRAVEDAD NO SE CALCULA BIEN
         // Calculate accelerations for all bodies
-        for (int i = 7; i < sim->bodyCount; i++)
+
+        
+        for (int i = 0; i < sim->bodyCount; i++)
         {
             Vector3 netForce = {0, 0, 0};
-
+ 
             for(int j = 0; j < sim->bodyCount; j++)
             {
                 if (i != j)
@@ -202,7 +206,10 @@
             // Update velocity using current acceleration (v(n+1) = v(n) + a(n) * dt)
             sim->bodies[i].velocity = Vector3Add(sim->bodies[i].velocity,
                                                 Vector3Scale(accelerations[i], sim->timeStep));
+
+            
         }
+    
         
         //* POSITION UPDATE
 
