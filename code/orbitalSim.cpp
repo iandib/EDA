@@ -33,7 +33,9 @@
     #define GRAVITATIONAL_CONSTANT (6.6743E-11L)
     #define ASTEROIDS_MEAN_RADIUS 4E11F
     #define M_PI 3.14159265358979323846
-    #define ALPHA_CENTAURI 2
+    #define YES 1
+    #define NO 0
+    #define ALPHA_CENTAURI YES
 
     // Number of asteroids to generate
     #define NUM_ASTEROIDS 0
@@ -151,6 +153,7 @@
             sim->bodies[i].name = solarSystem[i].name;
         }
 		 // Copy Alpha Centauri system bodies from ephemerides
+	    if (ALPHA_CENTAURI) {
 
          for (int j = 0; j < ALPHACENTAURISYSTEM_BODYNUM; j++) {
 
@@ -162,7 +165,7 @@
 			 sim->bodies[j + SOLARSYSTEM_BODYNUM].name = alphaCentauriSystem[j].name;
 
          } 
-         
+	    }
         // Configure asteroids
         float centerMass = solarSystem[0].mass; // Sun's mass
         for (int i = 0; i < NUM_ASTEROIDS; i++)
