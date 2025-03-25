@@ -32,9 +32,10 @@
 
     #define GRAVITATIONAL_CONSTANT (6.6743E-11L)
     #define ASTEROIDS_MEAN_RADIUS 4E11F
+    #define M_PI 3.14159265358979323846
 
     // Number of asteroids to generate
-    #define NUM_ASTEROIDS 500
+    #define NUM_ASTEROIDS 50
 
 
 /* *****************************************************************
@@ -139,16 +140,22 @@
         sim->bodies = new OrbitalBody[sim->bodyCount];
         
         // Copy solar system bodies from ephemerides
-        for (int i = 0; i < SOLARSYSTEM_BODYNUM; i++)
+         for (int i = 0; i < SOLARSYSTEM_BODYNUM; i++)
         {
             sim->bodies[i].velocity = solarSystem[i].velocity;
             sim->bodies[i].position = solarSystem[i].position;
             sim->bodies[i].color = solarSystem[i].color;
-            sim->bodies[i].mass = solarSystem[i].mass;
+			// jupiter mass *1000
+			if (i == 5) {
+				sim->bodies[i].mass = ((solarSystem[i].mass) * 1000.0);
+            }
+            else {
+                sim->bodies[i].mass = solarSystem[i].mass;
+            }
             sim->bodies[i].radius = solarSystem[i].radius;
             sim->bodies[i].name = solarSystem[i].name;
         }
-        
+       
         // Configure asteroids
         float centerMass = solarSystem[0].mass; // Sun's mass
         for (int i = 0; i < NUM_ASTEROIDS; i++)

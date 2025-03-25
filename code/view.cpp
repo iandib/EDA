@@ -135,6 +135,7 @@
             DrawPoint3D(scaledPosition, sim->bodies[i].color);
         }
 
+
         // Draw reference grid
         DrawGrid(30, 1.0f);
         
