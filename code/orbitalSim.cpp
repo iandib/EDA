@@ -33,9 +33,10 @@
     #define GRAVITATIONAL_CONSTANT (6.6743E-11L)
     #define ASTEROIDS_MEAN_RADIUS 4E11F
     #define M_PI 3.14159265358979323846
+    #define ALPHA_CENTAURI 2
 
     // Number of asteroids to generate
-    #define NUM_ASTEROIDS 50
+    #define NUM_ASTEROIDS 0
 
 
 /* *****************************************************************
@@ -134,7 +135,7 @@
         sim->time = 0.0f;
         
         // Define the number of bodies (solar system + asteroids)
-        sim->bodyCount = SOLARSYSTEM_BODYNUM + NUM_ASTEROIDS;
+        sim->bodyCount = SOLARSYSTEM_BODYNUM + ALPHACENTAURISYSTEM_BODYNUM + NUM_ASTEROIDS;
         
         // Allocate memory for the bodies
         sim->bodies = new OrbitalBody[sim->bodyCount];
@@ -145,17 +146,23 @@
             sim->bodies[i].velocity = solarSystem[i].velocity;
             sim->bodies[i].position = solarSystem[i].position;
             sim->bodies[i].color = solarSystem[i].color;
-			// jupiter mass *1000
-			if (i == 5) {
-				sim->bodies[i].mass = ((solarSystem[i].mass) * 1000.0);
-            }
-            else {
-                sim->bodies[i].mass = solarSystem[i].mass;
-            }
+		    sim->bodies[i].mass = solarSystem[i].mass;
             sim->bodies[i].radius = solarSystem[i].radius;
             sim->bodies[i].name = solarSystem[i].name;
         }
-       
+		 // Copy Alpha Centauri system bodies from ephemerides
+
+         for (int j = 0; j < ALPHACENTAURISYSTEM_BODYNUM; j++) {
+
+			 sim->bodies[j + SOLARSYSTEM_BODYNUM].velocity = alphaCentauriSystem[j].velocity;   
+			 sim->bodies[j + SOLARSYSTEM_BODYNUM].position = alphaCentauriSystem[j].position;   
+			 sim->bodies[j + SOLARSYSTEM_BODYNUM].color = alphaCentauriSystem[j].color; 
+			 sim->bodies[j + SOLARSYSTEM_BODYNUM].mass = alphaCentauriSystem[j].mass;
+			 sim->bodies[j + SOLARSYSTEM_BODYNUM].radius = alphaCentauriSystem[j].radius;
+			 sim->bodies[j + SOLARSYSTEM_BODYNUM].name = alphaCentauriSystem[j].name;
+
+         } 
+         
         // Configure asteroids
         float centerMass = solarSystem[0].mass; // Sun's mass
         for (int i = 0; i < NUM_ASTEROIDS; i++)

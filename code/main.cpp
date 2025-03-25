@@ -37,7 +37,7 @@
         float timeMultiplier = 100 * SECONDS_PER_DAY;
 
         // Time interval used to analyze data
-        float timeStep = timeMultiplier / fps;
+        float timeStep = timeMultiplier*0.2 / fps;
 
 
         //* SIMULATION SETUP, UPDATE AND RENDERING

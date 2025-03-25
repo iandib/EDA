@@ -120,7 +120,7 @@
 
         //* 3D DRAWING CODE
 
-        for(int i = 0; i < sim->bodyCount; i++)
+        for(int i = 0; i < sim->bodyCount ; i++)
         {
             // Scale position according to the recommended scale factor
             Vector3 scaledPosition = Vector3Scale(sim->bodies[i].position, SCALE_FACTOR);
