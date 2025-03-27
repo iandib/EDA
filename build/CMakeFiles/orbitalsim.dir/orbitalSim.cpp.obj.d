@@ -27,8 +27,6 @@ CMakeFiles/orbitalsim.dir/orbitalSim.cpp.obj: \
  C:/msys64/mingw64/include/c++/14.2.0/ext/type_traits.h \
  C:/msys64/mingw64/include/math.h \
  C:/msys64/mingw64/include/c++/14.2.0/bits/version.h \
- C:/msys64/mingw64/include/string.h \
- C:/msys64/mingw64/include/sec_api/string_s.h \
  E:\3C\EDA\Practice\Repo\code\OrbitalSim.h \
  C:/msys64/mingw64/include/raylib.h \
  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h \

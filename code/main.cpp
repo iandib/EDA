@@ -31,7 +31,7 @@
         //* LOCAL VARIABLES
         
         // Frames per second
-        int fps = 60;
+        int fps = 140;
 
         // Simulation speed: 100 days per simulation second
         float timeMultiplier = 100 * SECONDS_PER_DAY;
