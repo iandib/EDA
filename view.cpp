@@ -90,13 +90,13 @@
                                                             SCALE_FACTOR);
             
             // Determine if the body is an asteroid
-            bool isAsteroid = i >= SOLARSYSTEM_BODYNUM;
+            int isAsteroid = (i < NUM_ASTEROIDS);
             
             // Calculate visual size using the recommended empirical formula
             float visualRadius = 0.005F * logf(sim->bodies[i].radius);
             
             // Dynamic rendering based on camera distance
-            if (cameraDistance < renderDistance)
+            if ((cameraDistance < renderDistance) || (!isAsteroid))
             {
                 // Close view: draw spheres
                 DrawSphere(scaledPosition, visualRadius, sim->bodies[i].color);
@@ -115,11 +115,9 @@
                     Vector3 lineTop = Vector3Add(scaledPosition, Vector3Scale(direction, 0.1f));
                     Vector3 lineBottom = Vector3Subtract(scaledPosition, Vector3Scale(direction, 0.1f));
                     DrawLine3D(lineTop, lineBottom, sim->bodies[i].color);
-                }
-
-                else 
+                } else 
                 {
-                    // Dense bodies rendered as points
+                    // Dense bodies rendered as point
                     DrawPoint3D(scaledPosition, sim->bodies[i].color);
                 }
             }
@@ -171,22 +169,8 @@
         //* 3D DRAWING CODE
 
         // Render asteroids
-        renderOptimizer(sim, 0, NUM_ASTEROIDS - 1, asteroidRenderDistance,
+        renderOptimizer(sim, 0, sim->bodyCount, asteroidRenderDistance,
             cameraDistance);
-
-        for (int i = NUM_ASTEROIDS; i < sim->bodyCount; i++)
-        {
-            // Scale position according to the recommended scale factor
-            Vector3 scaledPosition = Vector3Scale(sim->bodies[i].position, SCALE_FACTOR);
-            Vector3 scaledPreviousPosition = Vector3Scale(sim->bodies[i].previousPosition,
-                SCALE_FACTOR);
-
-            // Calculate visual size using the recommended empirical formula
-            float visualRadius = 0.005F * logf(sim->bodies[i].radius);
-
-            DrawSphere(scaledPosition, visualRadius, sim->bodies[i].color);
-        }
-
         // Draw reference grid
         DrawGrid(50, 1.0f);
         

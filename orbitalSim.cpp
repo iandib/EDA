@@ -164,8 +164,7 @@
 
                 // Calculate accelerations using Newton's second law, a = F / m
                 // and use Newton's third law, action-reaction pairs, to avoid calculating the same force twice
-                accelerations[i] = Vector3Add(accelerations[i], 
-                                    Vector3Scale(force, 1.0f / sim->bodies[i].mass));
+                accelerations[i] = Vector3Add(accelerations[i], Vector3Scale(force, 1.0f / sim->bodies[i].mass));
 
                 accelerations[j] = Vector3Subtract(accelerations[j],
                                     Vector3Scale(force, 1.0f / sim->bodies[j].mass));
@@ -287,8 +286,8 @@
         
         // Calculate accelerations due to the gravitational force between asteroids and significant bodies
         calculateAccelerations(sim, accelerations, 
-                                NUM_ASTEROIDS, sim->bodyCount,
-                                0, NUM_ASTEROIDS - 1);
+                                0, NUM_ASTEROIDS - 1,
+                                NUM_ASTEROIDS, sim->bodyCount);
         
         //? ES CORRECTO CALCULAR VELOCIDADES A LA PAR QUE POSICIONES
         // Update velocities and positions using the corresponding current acceleration
