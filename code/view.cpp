@@ -11,18 +11,21 @@
     * FILE CONFIGURATION *
    ***************************************************************** */
 
-    //* NECESSARY LIBRARIES AND HEADERS
+    //* NECESSARY LIBRARIES
 
     #include <time.h>
 
-    //? SE PUEDE INCLUIR RAYMATH EN ESTE ARCHIVO?
     #include "raylib.h"
     #include "raymath.h"
-    #include "OrbitalSim.h"
-    #include "View.h"
 
-    //! POR QUÉ DA PROBLEMAS ESTE INCLUDE?
-    // #include "ephemerides.h"
+    #include <stdio.h>
+
+
+    //* NECESSARY HEADERS
+
+    #include "View.h"
+    #include "OrbitalSim.h"
+
 
     //* CONSTANTS
     
@@ -73,21 +76,22 @@
 
     //* RENDERING OPTIMIZER
 
-    /// @brief Determines the rendering method for bodies based on distance
+    /// @brief Renders significant bodies as spheres and asteroids as either spheres or lines,
+            // depending on their distance to the camera
     /// @param sim The orbital simulation
     /// @param startIndex Starting index of the group of bodies to render
     /// @param endIndex Ending index of the group of bodies to render
     /// @param renderDistance Render distance threshold
     /// @param cameraDistance Camera distance from the origin
     void renderOptimizer(OrbitalSim *sim, int startIndex, int endIndex, 
-                        float renderDistance, float cameraDistance) 
+                    float renderDistance, float cameraDistance) 
     {
         for(int i = startIndex; i < endIndex; i++)
         {
             // Scale position according to the recommended scale factor
             Vector3 scaledPosition = Vector3Scale(sim->bodies[i].position, SCALE_FACTOR);
             Vector3 scaledPreviousPosition = Vector3Scale(sim->bodies[i].previousPosition, 
-                                                            SCALE_FACTOR);
+                                                         SCALE_FACTOR);
             
             // Determine if the body is an asteroid
             int isAsteroid = (i < NUM_ASTEROIDS);
@@ -95,30 +99,32 @@
             // Calculate visual size using the recommended empirical formula
             float visualRadius = 0.005F * logf(sim->bodies[i].radius);
             
-            // Dynamic rendering based on camera distance
-            if ((cameraDistance < renderDistance) || (!isAsteroid))
+            // Significant bodies always rendered as spheres
+            if (!isAsteroid)
             {
-                // Close view: draw spheres
                 DrawSphere(scaledPosition, visualRadius, sim->bodies[i].color);
             }
 
+            // Asteroids have dynamic rendering based on camera distance
             else 
             {
-                // Far view: different rendering for planets and asteroids
-                if (isAsteroid)
+                // Close view: draw asteroids as spheres
+                if (cameraDistance < renderDistance)
+                {
+                    DrawSphere(scaledPosition, visualRadius, sim->bodies[i].color);
+                }
+
+                // Far view: asteroids rendered as lines
+                else 
                 {
                     // Calculate and normalize the direction vector of the asteroid's movement
                     Vector3 direction = Vector3Subtract(scaledPosition, scaledPreviousPosition);
                     direction = Vector3Normalize(direction);
 
-                    // Asteroids rendered as lines
+                    // The line is drawn as a small segment in the direction of the movement
                     Vector3 lineTop = Vector3Add(scaledPosition, Vector3Scale(direction, 0.1f));
                     Vector3 lineBottom = Vector3Subtract(scaledPosition, Vector3Scale(direction, 0.1f));
                     DrawLine3D(lineTop, lineBottom, sim->bodies[i].color);
-                } else 
-                {
-                    // Dense bodies rendered as point
-                    DrawPoint3D(scaledPosition, sim->bodies[i].color);
                 }
             }
         }
@@ -158,8 +164,7 @@
 
         // Calculate camera distance threshold for switching rendering modes
         float cameraDistance = Vector3Length(view->camera.position);
-        float planetRenderDistance = 30.0f;
-        float asteroidRenderDistance = 10.0f;
+        float renderDistance = 10.0f;
 
         BeginDrawing();
 
@@ -168,9 +173,9 @@
 
         //* 3D DRAWING CODE
 
-        // Render asteroids
-        renderOptimizer(sim, 0, sim->bodyCount, asteroidRenderDistance,
-            cameraDistance);
+        // Render asteroids and significant bodies if enabled in orbitalSim.cpp
+        renderOptimizer(sim, 0, sim->bodyCount, renderDistance, cameraDistance);
+
         // Draw reference grid
         DrawGrid(50, 1.0f);
         

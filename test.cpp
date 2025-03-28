@@ -32,9 +32,8 @@
 
     #define GRAVITATIONAL_CONSTANT (6.6743E-11L)
     #define ASTEROIDS_MEAN_RADIUS 4E11F
-    #define M_PI 3.14159265358979323846
 
-    
+    #define M_PI 3.14159265358979323846
 
 
 /* *****************************************************************
@@ -52,7 +51,6 @@
         return min + (max - min) * rand() / (float)RAND_MAX;
     }
 
-    //? ESTO ESTÁ PIOLA, PERO ES VÁLIDO COMO ADICIONAL?
     /// @brief Configures an asteroid
     /// @param body An orbital body
     /// @param centerMass The mass of the most massive object in the star system
@@ -164,7 +162,8 @@
 
                 // Calculate accelerations using Newton's second law, a = F / m
                 // and use Newton's third law, action-reaction pairs, to avoid calculating the same force twice
-                accelerations[i] = Vector3Add(accelerations[i], Vector3Scale(force, 1.0f / sim->bodies[i].mass));
+                accelerations[i] = Vector3Add(accelerations[i], 
+                                    Vector3Scale(force, 1.0f / sim->bodies[i].mass));
 
                 accelerations[j] = Vector3Subtract(accelerations[j],
                                     Vector3Scale(force, 1.0f / sim->bodies[j].mass));
@@ -184,92 +183,88 @@
     {
         // Allocate memory for the simulation structure
         OrbitalSim* sim = new OrbitalSim;
-
+        
         // Initialize fields
         sim->timeStep = timeStep;
         sim->time = 0.0f;
-
-        // Define the number of bodies
-        sim->bodyCount = SOLARSYSTEM_BODYNUM * SOLAR_SYSTEM + ALPHACENTAURISYSTEM_BODYNUM * ALPHA_CENTAURI + NUM_ASTEROIDS + BLACKHOLE;
-
+        
+        // Total number of bodies in the simulation
+        sim->bodyCount = SOLARSYSTEM_BODYNUM * SOLAR_SYSTEM + ALPHACENTAURISYSTEM_BODYNUM * ALPHA_CENTAURI 
+                        + NUM_ASTEROIDS + BLACKHOLE;
+        
+        // Index for all the bodies in the simulation
         int TotalBodyNum = sim->bodyCount - 1;
-
+        
         // Allocate memory for the bodies
         sim->bodies = new OrbitalBody[sim->bodyCount];
-
-        if (SOLAR_SYSTEM) {
-            // Copy solar system bodies from ephemerides
+      
+        // Copy solar system bodies from ephemerides
+        if (SOLAR_SYSTEM)
+        {
             for (int i = 0; i < SOLARSYSTEM_BODYNUM; i++)
             {
                 sim->bodies[TotalBodyNum].velocity = solarSystem[i].velocity;
                 sim->bodies[TotalBodyNum].position = solarSystem[i].position;
                 sim->bodies[TotalBodyNum].color = solarSystem[i].color;
-                if (MASIVE_JUPITER && (i == 5)) {
-                    sim->bodies[TotalBodyNum].mass = ((solarSystem[i].mass) * 1000.0); // Massive Jupiter
-                }
-                else {
+                if (MASIVE_JUPITER && (i == 5))
+                    sim->bodies[TotalBodyNum].mass = ((solarSystem[i].mass) * 1000.0);
+                else
                     sim->bodies[TotalBodyNum].mass = solarSystem[i].mass;
-                }
                 sim->bodies[TotalBodyNum].radius = solarSystem[i].radius;
                 sim->bodies[TotalBodyNum].name = solarSystem[i].name;
                 TotalBodyNum--;
             }
         }
+
         // Copy Alpha Centauri system bodies from ephemerides
-        if (ALPHA_CENTAURI) {
-            for (int j = 0; j < ALPHACENTAURISYSTEM_BODYNUM; j++) {
-
+        if (ALPHA_CENTAURI)
+        {
+            for (int j = 0; j < ALPHACENTAURISYSTEM_BODYNUM; j++)
+            {
                 sim->bodies[TotalBodyNum].velocity = alphaCentauriSystem[j].velocity;
-
                 sim->bodies[TotalBodyNum].position = alphaCentauriSystem[j].position;
-
                 sim->bodies[TotalBodyNum].color = alphaCentauriSystem[j].color;
-
                 sim->bodies[TotalBodyNum].mass = alphaCentauriSystem[j].mass;
-
                 sim->bodies[TotalBodyNum].radius = alphaCentauriSystem[j].radius;
-
                 sim->bodies[TotalBodyNum].name = alphaCentauriSystem[j].name;
+                TotalBodyNum--;
+            }
+        }
+
+        // Black Hole setup
+        if (BLACKHOLE)
+        {
+            sim->bodies[TotalBodyNum].name = "Black Hole";
+            sim->bodies[TotalBodyNum].mass = ((solarSystem[0].mass) * 100.0); // stellar black hole (*100 mass)
+            sim->bodies[TotalBodyNum].radius = 2E20F;
+            sim->bodies[TotalBodyNum].color = DARKPURPLE;
+            sim->bodies[TotalBodyNum].position = { 4.431790029686977E+12F, -8.954348456482631E+10F, 0 };
+            sim->bodies[TotalBodyNum].velocity = { -9.431790029686977E+4F, 8.954348456482631E+1F, 6.114486878028781E+1F };
+            TotalBodyNum--;
+        }
+
+        // Sun's mass
+        float centerMass = solarSystem[0].mass;
+
+        // Asteroids setup
+        if (NUM_ASTEROIDS)
+        {
+            for (int i = 0; i < NUM_ASTEROIDS; i++)
+            {
+                OrbitalBody* body = &sim->bodies[TotalBodyNum + i];
+                body->name = "Asteroid";
+                configureAsteroid(body, centerMass);
+
+                // Set the previous position to the current position
+                body->previousPosition = body->position;
 
                 TotalBodyNum--;
             }
         }
-            // Black Hole configuration
-            if (BLACKHOLE) {
-
-                sim->bodies[TotalBodyNum].name = "Black Hole";
-
-                sim->bodies[TotalBodyNum].mass = ((solarSystem[0].mass) * 100.0); // stellar black hole (*100 mass)
-
-                sim->bodies[TotalBodyNum].radius = 2E20F;
-
-                sim->bodies[TotalBodyNum].color = DARKPURPLE;
-
-                sim->bodies[TotalBodyNum].position = { 4.431790029686977E+12F, -8.954348456482631E+10F, 0 };
-
-                sim->bodies[TotalBodyNum].velocity = { -9.431790029686977E+4F, 8.954348456482631E+1F, 6.114486878028781E+1F };
-
-                TotalBodyNum--;
-            }
-            // Configure asteroids
-            float centerMass = solarSystem[0].mass; // Sun's mass
-
-            if (NUM_ASTEROIDS) {
-                for (int i = 0; i < NUM_ASTEROIDS; i++)
-                {
-                    OrbitalBody* body = &sim->bodies[TotalBodyNum];
-                    body->name = "Asteroid";
-                    configureAsteroid(body, centerMass);
-                    TotalBodyNum--;
-                }
-            }
-
-            return sim;
-        }
- 
-   
-
-
+        
+        
+        return sim;
+    }
 
 
     /// @brief Simulates a timestep
@@ -285,8 +280,8 @@
                                 NUM_ASTEROIDS, sim->bodyCount);
         
         // Calculate accelerations due to the gravitational force between asteroids and significant bodies
-        calculateAccelerations(sim, accelerations, 
-                                0, NUM_ASTEROIDS - 1,
+        calculateAccelerations(sim, accelerations,
+                                0, NUM_ASTEROIDS - 1, 
                                 NUM_ASTEROIDS, sim->bodyCount);
         
         //? ES CORRECTO CALCULAR VELOCIDADES A LA PAR QUE POSICIONES
@@ -320,4 +315,3 @@
         delete[] sim->bodies;
         delete sim;
     }
-

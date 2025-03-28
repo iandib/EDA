@@ -37,5 +37,10 @@ CMakeFiles/orbitalsim.dir/view.cpp.obj: \
  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
  C:/msys64/mingw64/include/errno.h \
  C:/msys64/mingw64/include/c++/14.2.0/bits/version.h \
+ C:/msys64/mingw64/include/stdio.h \
+ C:/msys64/mingw64/include/corecrt_stdio_config.h \
+ C:/msys64/mingw64/include/_mingw_off_t.h \
+ C:/msys64/mingw64/include/swprintf.inl \
+ C:/msys64/mingw64/include/sec_api/stdio_s.h \
  E:\3C\EDA\Practice\Repo\code\View.h \
  E:\3C\EDA\Practice\Repo\code\OrbitalSim.h

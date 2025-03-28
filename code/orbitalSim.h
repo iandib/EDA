@@ -18,17 +18,16 @@
    #include <raylib.h>
    #include <raymath.h>
 
+    //* CONFIGURATION
+
+    #define SOLAR_SYSTEM 1
+    #define ALPHA_CENTAURI 0
+    #define BLACKHOLE 0
+    #define MASIVE_JUPITER 0
+    #define NUM_ASTEROIDS 100
+
+
     //* CONSTANTS & STRUCTURES
-#define SOLARSYSTEM_BODYNUM 7
-#define ALPHACENTAURISYSTEM_BODYNUM 2
-
-
-#define SOLAR_SYSTEM 1
-#define ALPHA_CENTAURI 0
-#define BLACKHOLE 0
-#define MASIVE_JUPITER 0
-#define NUM_ASTEROIDS 50
-
    
     /// @brief Orbital body definition
     struct OrbitalBody
