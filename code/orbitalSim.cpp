@@ -36,14 +36,6 @@
     // Number of asteroids to generate
     #define NUM_ASTEROIDS 500
 
-    
-    //* CONFIGURATION
-
-    #define SOLAR_SYSTEM 1
-    #define ALPHA_CENTAURI 0
-    #define BLACKHOLE 0
-    #define MASIVE_JUPITER 0
-
 
 /* *****************************************************************
     * LOGIC MODULES *
@@ -198,8 +190,9 @@
         sim->timeStep = timeStep;
         sim->time = 0.0f;
         
-        // Define the number of bodies (solar system + asteroids)
-        sim->bodyCount = SOLARSYSTEM_BODYNUM + NUM_ASTEROIDS;
+        // Total number of bodies in the simulation
+        sim->bodyCount = SOLARSYSTEM_BODYNUM * SOLAR_SYSTEM + ALPHACENTAURISYSTEM_BODYNUM * ALPHA_CENTAURI 
+                        + NUM_ASTEROIDS + BLACKHOLE;
         
         // Allocate memory for the bodies
         sim->bodies = new OrbitalBody[sim->bodyCount];
@@ -226,32 +219,35 @@
         // Copy Alpha Centauri system bodies from ephemerides
         if (ALPHA_CENTAURI)
         {
-            for (int i = 0, j = 0; j < ALPHACENTAURISYSTEM_BODYNUM; j++, i++)
+            int startIndex = SOLARSYSTEM_BODYNUM; // Start after solar system bodies
+            for (int j = 0; j < ALPHACENTAURISYSTEM_BODYNUM; j++)
             {
-                sim->bodies[i].velocity = alphaCentauriSystem[j].velocity;
-                sim->bodies[i].position = alphaCentauriSystem[j].position;
-                sim->bodies[i].color = alphaCentauriSystem[j].color;
-                sim->bodies[i].mass = alphaCentauriSystem[j].mass;
-                sim->bodies[i].radius = alphaCentauriSystem[j].radius;
-                sim->bodies[i].name = alphaCentauriSystem[j].name;
+                sim->bodies[startIndex + j].velocity = alphaCentauriSystem[j].velocity;
+                sim->bodies[startIndex + j].position = alphaCentauriSystem[j].position;
+                sim->bodies[startIndex + j].color = alphaCentauriSystem[j].color;
+                sim->bodies[startIndex + j].mass = alphaCentauriSystem[j].mass;
+                sim->bodies[startIndex + j].radius = alphaCentauriSystem[j].radius;
+                sim->bodies[startIndex + j].name = alphaCentauriSystem[j].name;
             }
         }
 
         // Black Hole setup
         if (BLACKHOLE)
         {
-            sim->bodies[sim->bodyCount].name = "Black Hole";
-            sim->bodies[sim->bodyCount].mass = ((solarSystem[0].mass) * 100.0); // stellar black hole (*100 mass)
-            sim->bodies[sim->bodyCount].radius = 2E20F;
-            sim->bodies[sim->bodyCount].color = DARKPURPLE;
-            sim->bodies[sim->bodyCount].position = { 4.431790029686977E+12F, -8.954348456482631E+10F, 0 };
-            sim->bodies[sim->bodyCount].velocity = { -9.431790029686977E+4F, 8.954348456482631E+1F, 6.114486878028781E+1F };
+            sim->bodies[sim->bodyCount - 1].name = "Black Hole";
+            sim->bodies[sim->bodyCount - 1].mass = ((solarSystem[0].mass) * 100.0); // stellar black hole (*100 mass)
+            sim->bodies[sim->bodyCount - 1].radius = 2E20F;
+            sim->bodies[sim->bodyCount - 1].color = DARKPURPLE;
+            sim->bodies[sim->bodyCount - 1].position = { 4.431790029686977E+12F, -8.954348456482631E+10F, 0 };
+            sim->bodies[sim->bodyCount - 1].velocity = { -9.431790029686977E+4F, 8.954348456482631E+1F, 6.114486878028781E+1F };
         }
 
         // Asteroids setup
+        int asteroidStartIndex = SOLARSYSTEM_BODYNUM + (ALPHA_CENTAURI ? ALPHACENTAURISYSTEM_BODYNUM : 0);
+        
         for (int k = 0; k < NUM_ASTEROIDS; k++)
         {
-            OrbitalBody *body = &sim->bodies[SOLARSYSTEM_BODYNUM + k];
+            OrbitalBody *body = &sim->bodies[asteroidStartIndex + k];
             body->name = "Asteroid";
             configureAsteroid(body, centerMass);
 

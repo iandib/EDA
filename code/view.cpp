@@ -15,7 +15,7 @@
 
     #include <time.h>
 
-    //? SE PUEDE INCLUIR RAYMATH EN ESTE ARCHIVO
+    //? SE PUEDE INCLUIR RAYMATH EN ESTE ARCHIVO?
     #include "raylib.h"
     #include "raymath.h"
 
@@ -24,6 +24,11 @@
     //! POR QUÉ DA PROBLEMAS ESTE INCLUDE?
     // #include "ephemerides.h"
     #define SOLARSYSTEM_BODYNUM 7
+    #define ALPHACENTAURISYSTEM_BODYNUM 2
+    #define SOLAR_SYSTEM 0
+    #define ALPHA_CENTAURI 1
+    #define BLACKHOLE 0
+    #define MASIVE_JUPITER 0
 
 
     //* CONSTANTS
@@ -121,7 +126,7 @@
 
                 else 
                 {
-                    // Planets rendered as points
+                    // Dense bodies rendered as points
                     DrawPoint3D(scaledPosition, sim->bodies[i].color);
                 }
             }
@@ -172,8 +177,24 @@
 
         //* 3D DRAWING CODE
 
-        // Render planets
-        renderOptimizer(sim, 0, SOLARSYSTEM_BODYNUM, planetRenderDistance, cameraDistance);
+        // Render Solar System if enabled
+        if (SOLAR_SYSTEM)
+        {
+            renderOptimizer(sim, 0, SOLARSYSTEM_BODYNUM, planetRenderDistance, cameraDistance);
+        }
+
+        // Render Alpha Centauri system if enabled
+        if (ALPHA_CENTAURI)
+        {
+            renderOptimizer(sim, SOLARSYSTEM_BODYNUM, SOLARSYSTEM_BODYNUM + ALPHACENTAURISYSTEM_BODYNUM,
+                            planetRenderDistance, cameraDistance);
+        }
+
+        // Render black hole if enabled
+        if (BLACKHOLE)
+        {
+            renderOptimizer(sim, sim->bodyCount - 1, sim->bodyCount, planetRenderDistance, cameraDistance);
+        }
 
         // Render asteroids
         renderOptimizer(sim, SOLARSYSTEM_BODYNUM, sim->bodyCount, asteroidRenderDistance,
