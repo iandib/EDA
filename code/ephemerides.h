@@ -21,14 +21,6 @@
     #include "raymath.h"
 
 
-    //* CONFIGURATION
-
-    #define SOLAR_SYSTEM 0
-    #define ALPHA_CENTAURI 1
-    #define BLACKHOLE 0
-    #define MASIVE_JUPITER 0
-
-
     //* CONSTANTS & STRUCTURES
 
     #define SOLARSYSTEM_BODYNUM (sizeof(solarSystem) / sizeof(EphemeridesBody))

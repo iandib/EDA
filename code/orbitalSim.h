@@ -18,6 +18,18 @@
    #include <raylib.h>
    #include <raymath.h>
 
+
+    //* CONFIGURATION
+
+    #define SOLAR_SYSTEM 1
+    #define ALPHA_CENTAURI 0
+    #define BLACKHOLE 0
+    #define MASIVE_JUPITER 0
+
+    // Number of asteroids to generate
+    #define NUM_ASTEROIDS 50
+
+
     //* CONSTANTS & STRUCTURES
    
     /// @brief Orbital body definition
