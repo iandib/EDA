@@ -16,7 +16,8 @@
         "stdlib.h": "c",
         "allegro_image.h": "c",
         "th2_display_sound.h": "c",
-        "semaphore.h": "c"
+        "semaphore.h": "c",
+        "random": "cpp"
     },
     "cmake.sourceDirectory": "E:/3C/EDA/Practice/Repo/code",
     "C_Cpp.default.compilerPath": "C:/msys64/mingw64/bin/g++.exe"

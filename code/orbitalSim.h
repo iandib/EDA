@@ -24,11 +24,12 @@
     struct OrbitalBody
     {
         const char *name;
-        float mass;         // [kg]
-        float radius;       // [m]
-        Color color;        // Raylib color
-        Vector3 position;   // [m]
-        Vector3 velocity;   // [m/s]
+        float mass;                 // [kg]
+        float radius;               // [m]
+        Color color;                // Raylib color
+        Vector3 position;           // [m]
+        Vector3 previousPosition;   // [m]
+        Vector3 velocity;           // [m/s]
     };
 
 
