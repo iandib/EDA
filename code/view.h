@@ -32,7 +32,7 @@
    
     //* PUBLIC FUNCTIONS PROTOTYPES
 
-    View *constructView(int fps);
+    View* constructView(int fps);
     void destroyView(View *view);
     bool isViewRendering(View *view);
     void renderView(View *view, OrbitalSim *sim);
