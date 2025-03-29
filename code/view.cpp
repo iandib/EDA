@@ -11,10 +11,20 @@
     * FILE CONFIGURATION *
    ***************************************************************** */
 
-    //* NECESSARY LIBRARIES AND HEADERS
+    //* NECESSARY LIBRARIES
 
     #include <time.h>
+
+    #include "raylib.h"
+    #include "raymath.h"
+
+    #include <stdio.h>
+
+
+    //* NECESSARY HEADERS
+
     #include "View.h"
+    #include "OrbitalSim.h"
 
 
     //* CONSTANTS
@@ -42,7 +52,7 @@
     * LOGIC MODULES *
    ***************************************************************** */
 
-    //* GENERAL FUNCTIONALITY MODULES
+    //* DATE CONTROL
 
     /// @brief Converts a timestamp (number of seconds since 1/1/2022)
             // to an ISO date ("YYYY-MM-DD")
@@ -63,8 +73,65 @@
                         1900 + localTM->tm_year, localTM->tm_mon + 1, localTM->tm_mday);
     }
 
+
+    //* RENDERING OPTIMIZER
+
+    /// @brief Renders significant bodies as spheres and asteroids as either spheres or lines,
+            // depending on their distance to the camera
+    /// @param sim The orbital simulation
+    /// @param startIndex Starting index of the group of bodies to render
+    /// @param endIndex Ending index of the group of bodies to render
+    /// @param renderDistance Render distance threshold
+    /// @param cameraDistance Camera distance from the origin
+    void renderOptimizer(OrbitalSim *sim, int startIndex, int endIndex, 
+                    float renderDistance, float cameraDistance) 
+    {
+        for(int i = startIndex; i < endIndex; i++)
+        {
+            // Scale position according to the recommended scale factor
+            Vector3 scaledPosition = Vector3Scale(sim->bodies[i].position, SCALE_FACTOR);
+            Vector3 scaledPreviousPosition = Vector3Scale(sim->bodies[i].previousPosition, 
+                                                         SCALE_FACTOR);
+            
+            // Determine if the body is an asteroid
+            int isAsteroid = (i < NUM_ASTEROIDS);
+            
+            // Calculate visual size using the recommended empirical formula
+            float visualRadius = 0.005F * logf(sim->bodies[i].radius);
+            
+            // Significant bodies always rendered as spheres
+            if (!isAsteroid)
+            {
+                DrawSphere(scaledPosition, visualRadius, sim->bodies[i].color);
+            }
+
+            // Asteroids have dynamic rendering based on camera distance
+            else 
+            {
+                // Close view: draw asteroids as spheres
+                if (cameraDistance < renderDistance)
+                {
+                    DrawSphere(scaledPosition, visualRadius, sim->bodies[i].color);
+                }
+
+                // Far view: asteroids rendered as lines
+                else 
+                {
+                    // Calculate and normalize the direction vector of the asteroid's movement
+                    Vector3 direction = Vector3Subtract(scaledPosition, scaledPreviousPosition);
+                    direction = Vector3Normalize(direction);
+
+                    // The line is drawn as a small segment in the direction of the movement
+                    Vector3 lineTop = Vector3Add(scaledPosition, Vector3Scale(direction, 0.1f));
+                    Vector3 lineBottom = Vector3Subtract(scaledPosition, Vector3Scale(direction, 0.1f));
+                    DrawLine3D(lineTop, lineBottom, sim->bodies[i].color);
+                }
+            }
+        }
+    }
+
     
-    //* VIEW MANAGEMENT MODULES
+    //* VIEW MANAGEMENT
 
     /// @brief Constructs an orbital simulation view
     /// @param fps Frames per second for the view
@@ -88,30 +155,16 @@
     }
 
 
-    /// @brief Destroys an orbital simulation view
-    /// @param view The view
-    void destroyView(View *view)
-    {
-        CloseWindow();
-        delete view;
-    }
-
-
-    /// @brief Should the view still render?
-    /// @param view
-    /// @return Should rendering continue?
-    bool isViewRendering(View *view)
-    {
-        return !WindowShouldClose();
-    }
-
-
     /// @brief Renders an orbital simulation
     /// @param view
     /// @param sim The orbital sim
     void renderView(View *view, OrbitalSim *sim)
     {
         UpdateCamera(&view->camera, CAMERA_FREE);
+
+        // Calculate camera distance threshold for switching rendering modes
+        float cameraDistance = Vector3Length(view->camera.position);
+        float renderDistance = 10.0f;
 
         BeginDrawing();
 
@@ -120,23 +173,11 @@
 
         //* 3D DRAWING CODE
 
-        for(int i = 0; i < sim->bodyCount; i++)
-        {
-            // Scale position according to the recommended scale factor
-            Vector3 scaledPosition = Vector3Scale(sim->bodies[i].position, SCALE_FACTOR);
-            
-            // Calculate visual size using the recommended empirical formula
-            float visualRadius = 0.005F * logf(sim->bodies[i].radius);
-            
-            // Draw the sphere for the celestial body
-            DrawSphere(scaledPosition, visualRadius, sim->bodies[i].color);
-            
-            // Draw a point for distant objects to ensure visibility
-            DrawPoint3D(scaledPosition, sim->bodies[i].color);
-        }
+        // Render asteroids and significant bodies if enabled in orbitalSim.cpp
+        renderOptimizer(sim, 0, sim->bodyCount, renderDistance, cameraDistance);
 
         // Draw reference grid
-        DrawGrid(30, 1.0f);
+        DrawGrid(50, 1.0f);
         
         EndMode3D();
 
@@ -150,11 +191,29 @@
         
         // Show simulation time in days
         DrawText(TextFormat("Simulation Time: %.2f days", sim->time / 86400), 
-                 UI_MARGIN, UI_MARGIN + 2 * UI_LINE_SPACING, UI_TEXT_SIZE, UI_TEXT_COLOR);
+                UI_MARGIN, UI_MARGIN + 2 * UI_LINE_SPACING, UI_TEXT_SIZE, UI_TEXT_COLOR);
         
         // Show navigation help
         DrawText("Camera Controls: WASD to move, SPACE/CTRL to up/down, Q/E to rotate", 
-                 UI_MARGIN, WINDOW_HEIGHT - UI_LINE_SPACING, UI_TEXT_SIZE, UI_HIGHLIGHT_COLOR);
+                UI_MARGIN, WINDOW_HEIGHT - UI_LINE_SPACING, UI_TEXT_SIZE, UI_HIGHLIGHT_COLOR);
         
         EndDrawing();
+    }
+
+
+    /// @brief Should the view still render?
+    /// @param view
+    /// @return Should rendering continue?
+    bool isViewRendering(View *view)
+    {
+        return !WindowShouldClose();
+    }
+
+
+    /// @brief Destroys an orbital simulation view
+    /// @param view The view
+    void destroyView(View *view)
+    {
+        CloseWindow();
+        delete view;
     }

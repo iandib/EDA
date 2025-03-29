@@ -19,7 +19,7 @@
     // Graphic interface & vector math libraries
     #include "raylib.h"
     #include "raymath.h"
-
+    
 
     //* CONSTANTS & STRUCTURES
 
