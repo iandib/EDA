@@ -54,17 +54,18 @@
 
     //* DATE CONTROL
 
-    /// @brief Converts a timestamp (number of seconds since current date)
+    /// @brief Converts a timestamp (number of seconds since 1/1/2022)
             // to an ISO date ("YYYY-MM-DD")
     /// @param timestamp
     /// @return The ISO date (a raylib string)
     const char* getISODate(float timestamp)
     {
-        // Get current time as epoch
-        time_t currentTime = time(NULL);
-        
-        // Calculate the timestamp from the current time
-        time_t unixTimestamp = currentTime + (time_t)timestamp;
+        // Timestamp epoch: 1/1/2022
+        struct tm unichEpochTM = {0, 0, 0, 1, 0, 122};
+
+        // Convert timestamp to UNIX timestamp (number of seconds since 1/1/1970)
+        time_t unixEpoch = mktime(&unichEpochTM);
+        time_t unixTimestamp = unixEpoch + (time_t)timestamp;
 
         // Returns ISO date
         struct tm *localTM = localtime(&unixTimestamp);
