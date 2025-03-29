@@ -64,6 +64,5 @@ Al incrementar la masa de Júpiter, las órbitas de todos los planetas y del Sol
 
 - Añadido el sistema Alpha Centauri
 
-- Easter Egg: En el código base, el parámetro phi (ángulo de fase inicial en la órbita de los planetas) estaba definido como cero. Como resultado, todos los planetas espawneaban alineados sobre el mismo eje.
-
+- Easter Egg: En el código base, el parámetro phi (ángulo de fase inicial en la órbita de los planetas) estaba definido como cero. Como resultado, todos los planetas aparecían alineados sobre el mismo eje.
 No llegamos a completar la implementación de la nave con físicas realistas, así que descartamos ese código.]
