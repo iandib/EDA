@@ -31,8 +31,8 @@
         // Frames per second
         int fps = 140;
 
-        // Simulation speed: 100 days per simulation second
-        float timeMultiplier = 100 * SECONDS_PER_DAY;
+        // Simulation speed: 50 days per simulation second
+        float timeMultiplier = 50 * SECONDS_PER_DAY;
 
         // Time interval used to analyze data
         float timeStep = timeMultiplier / fps;

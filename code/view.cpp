@@ -54,23 +54,22 @@
 
     //* DATE CONTROL
 
-    /// @brief Converts a timestamp (number of seconds since 1/1/2022)
+    /// @brief Converts a timestamp (number of seconds since current date)
             // to an ISO date ("YYYY-MM-DD")
     /// @param timestamp
     /// @return The ISO date (a raylib string)
-    const char *getISODate(float timestamp)
+    const char* getISODate(float timestamp)
     {
-        // Timestamp epoch: 1/1/2022
-        struct tm unichEpochTM = {0, 0, 0, 1, 0, 122};
-
-        // Convert timestamp to UNIX timestamp (number of seconds since 1/1/1970)
-        time_t unixEpoch = mktime(&unichEpochTM);
-        time_t unixTimestamp = unixEpoch + (time_t)timestamp;
+        // Get current time as epoch
+        time_t currentTime = time(NULL);
+        
+        // Calculate the timestamp from the current time
+        time_t unixTimestamp = currentTime + (time_t)timestamp;
 
         // Returns ISO date
         struct tm *localTM = localtime(&unixTimestamp);
-        return TextFormat("%04d-%02d-%02d",
-                        1900 + localTM->tm_year, localTM->tm_mon + 1, localTM->tm_mday);
+        return TextFormat("%04d-%02d-%02d", 1900 + localTM->tm_year,
+                            localTM->tm_mon + 1, localTM->tm_mday);
     }
 
 
@@ -136,9 +135,9 @@
     /// @brief Constructs an orbital simulation view
     /// @param fps Frames per second for the view
     /// @return The view
-    View *constructView(int fps)
+    View* constructView(int fps)
     {
-        View *view = new View();
+        View* view = new View();
 
         InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "EDA Orbital Simulation");
         SetTargetFPS(fps);
