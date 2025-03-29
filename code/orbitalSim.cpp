@@ -231,12 +231,13 @@
             }
         }
 
-        // Black Hole setup
+        // Intermediate mass black hole setup
+        /// @cite https://en.wikipedia.org/wiki/Intermediate-mass_black_hole
         if (BLACKHOLE)
         {
             sim->bodies[TotalBodyNum].name = "Black Hole";
-            sim->bodies[TotalBodyNum].mass = ((solarSystem[0].mass) * 100.0); // stellar black hole (*100 mass)
-            sim->bodies[TotalBodyNum].radius = 2E20F;
+            sim->bodies[TotalBodyNum].mass = ((solarSystem[0].mass) * 100.0); // [kg]
+            sim->bodies[TotalBodyNum].radius = 2E20F; // [m]
             sim->bodies[TotalBodyNum].color = DARKPURPLE;
             sim->bodies[TotalBodyNum].position = { 4.431790029686977E+12F, -8.954348456482631E+10F, 0 };
             sim->bodies[TotalBodyNum].velocity = { -9.431790029686977E+4F, 8.954348456482631E+1F, 6.114486878028781E+1F };
@@ -246,6 +247,7 @@
         // Sun's mass
         float centerMass = solarSystem[0].mass;
 
+        // Asteroids setup
         for (int i = 0; i < NUM_ASTEROIDS; i++)
         {
             OrbitalBody* body = &sim->bodies[TotalBodyNum];
